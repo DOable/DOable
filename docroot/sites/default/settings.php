@@ -30,14 +30,6 @@ ini_set('url_rewriter.tags',        '');
 // settings.php for development on your local workstation, set $db_url
 // (Drupal 5 or 6) or $databases (Drupal 7 or 8) as described in comments above.
 
-if (file_exists('sites/default/settings.local.php')) {
-  require 'sites/default/settings.local.php';
-}
-
-if (file_exists('/var/www/site-php')) {
-  require('/var/www/site-php/doable/doable-settings.inc');
-}
-
 error_reporting(E_ALL);
 ini_set('display_errors', TRUE);
 ini_set('display_startup_errors', TRUE);
