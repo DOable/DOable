@@ -37,3 +37,7 @@ if (file_exists('sites/default/settings.local.php')) {
 if (file_exists('/var/www/site-php')) {
   require('/var/www/site-php/doable/doable-settings.inc');
 }
+
+if (file_exists('/var/www/site-php')) {
+  require '/var/www/site-php/doableorg/doableorg-settings.inc';
+}
