@@ -2135,10 +2135,11 @@ h3 a {
 /* line 366, ../sass/doable.scss */
 #block-system-user-menu li {
   list-style: none;
+  float: right;
 }
 
 /* SIDEBARS */
-/* line 375, ../sass/doable.scss */
+/* line 376, ../sass/doable.scss */
 h2.pane-title {
   font-family: "MuseoSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333333;
@@ -2151,40 +2152,40 @@ h2.pane-title {
 }
 
 /* Browse Solutions */
-/* line 391, ../sass/doable.scss */
+/* line 392, ../sass/doable.scss */
 .ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited,
 .view-solutions-browse-by-tag a {
   color: #333333;
 }
 
-/* line 396, ../sass/doable.scss */
+/* line 397, ../sass/doable.scss */
 .view-solutions-browse-by-tag a:hover {
   color: #3D8901;
 }
 
-/* line 400, ../sass/doable.scss */
+/* line 401, ../sass/doable.scss */
 .view-solutions-browse-by-tag .views-row {
   margin-bottom: .25em;
 }
 
-/* line 408, ../sass/doable.scss */
+/* line 409, ../sass/doable.scss */
 .ui-accordion .ui-accordion-header a {
   padding-left: 1.5em;
 }
 
-/* line 413, ../sass/doable.scss */
+/* line 414, ../sass/doable.scss */
 .ui-accordion .ui-accordion-header .ui-icon {
   left: 0em;
 }
 
-/* line 417, ../sass/doable.scss */
+/* line 418, ../sass/doable.scss */
 .ui-accordion .ui-accordion-header a {
   padding-left: 1.25em;
   padding-top: .35em;
   padding-bottom: .25em;
 }
 
-/* line 424, ../sass/doable.scss */
+/* line 425, ../sass/doable.scss */
 .ui-state-default,
 .ui-state-active,
 .ui-widget-content .ui-state-default,
@@ -2194,7 +2195,7 @@ h2.pane-title {
   border: none;
 }
 
-/* line 448, ../sass/doable.scss */
+/* line 449, ../sass/doable.scss */
 .ui-state-active,
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active {
@@ -2206,7 +2207,7 @@ h2.pane-title {
   border-right-width-value: 0px;
 }
 
-/* line 459, ../sass/doable.scss */
+/* line 460, ../sass/doable.scss */
 .view-solutions-browse-by-tag .ui-corner-all {
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
@@ -2214,12 +2215,12 @@ h2.pane-title {
   border-top-right-radius: 0px;
 }
 
-/* line 467, ../sass/doable.scss */
+/* line 468, ../sass/doable.scss */
 h3.ui-state-active a {
   color: #3D8901 !important;
 }
 
-/* line 471, ../sass/doable.scss */
+/* line 472, ../sass/doable.scss */
 .view-solutions-browse-by-tag .ui-accordion-content {
   padding-top: 5px;
   padding-bottom: 0px;
@@ -2228,14 +2229,14 @@ h3.ui-state-active a {
   border: none;
 }
 
-/* line 479, ../sass/doable.scss */
+/* line 480, ../sass/doable.scss */
 .view-solutions-browse-by-tag .ui-corner-bottom {
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 }
 
 /* PAGER */
-/* line 489, ../sass/doable.scss */
+/* line 490, ../sass/doable.scss */
 div.item-list ul.pager {
   margin-top: 20px;
   border-top: dotted 1px #D6D6D6;
@@ -2246,14 +2247,14 @@ div.item-list ul.pager {
   padding-bottom: 20px;
 }
 
-/* line 499, ../sass/doable.scss */
+/* line 500, ../sass/doable.scss */
 div.item-list li.pager-item,
 div.item-list li.pager-current {
   margin: 0 5px;
   padding: 0;
 }
 
-/* line 505, ../sass/doable.scss */
+/* line 506, ../sass/doable.scss */
 div.item-list li.pager-item a,
 div.item-list li.pager-ellipsis,
 div.item-list li.pager-current {
@@ -2269,19 +2270,19 @@ div.item-list li.pager-current {
   padding: 13px 8px 10px;
 }
 
-/* line 522, ../sass/doable.scss */
+/* line 523, ../sass/doable.scss */
 div.item-list li.pager-current {
   color: #333333;
   background: url(../images/icon-pager-current.png) no-repeat center center;
 }
 
-/* line 528, ../sass/doable.scss */
+/* line 529, ../sass/doable.scss */
 div.item-list li.pager-item a:hover {
   color: #3D8901;
   border-style: none;
 }
 
-/* line 533, ../sass/doable.scss */
+/* line 534, ../sass/doable.scss */
 div.item-list ul.pager li.pager-current first {
   margin-left: 0px;
   margin-right: 15px;
@@ -2289,7 +2290,7 @@ div.item-list ul.pager li.pager-current first {
   font-size: 11px;
 }
 
-/* line 540, ../sass/doable.scss */
+/* line 541, ../sass/doable.scss */
 div.item-list ul.pager li.pager-previous {
   margin-left: 0px;
   margin-right: 0px;
@@ -2297,7 +2298,7 @@ div.item-list ul.pager li.pager-previous {
   font-size: 11px;
 }
 
-/* line 547, ../sass/doable.scss */
+/* line 548, ../sass/doable.scss */
 div.item-list ul.pager li.pager-next,
 div.item-list ul.pager li.pager-last {
   margin-left: 15px;
@@ -2306,19 +2307,19 @@ div.item-list ul.pager li.pager-last {
   font-size: 11px;
 }
 
-/* line 555, ../sass/doable.scss */
+/* line 556, ../sass/doable.scss */
 ul.pager li a.active,
 ul.pager a {
   color: #333333;
 }
 
-/* line 560, ../sass/doable.scss */
+/* line 561, ../sass/doable.scss */
 ul.pager li a.active:hover,
 ul.pager a:hover {
   color: #CCCCCC;
 }
 
-/* line 565, ../sass/doable.scss */
+/* line 566, ../sass/doable.scss */
 ul.pager li.pager-current {
   color: #3D8901;
 }
