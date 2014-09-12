@@ -2126,8 +2126,19 @@ h3 a {
   float: right;
 }
 
-/* SIDEBARS */
+/* USER MENU */
 /* line 362, ../sass/doable.scss */
+#block-system-user-menu {
+  float: right;
+}
+
+/* line 366, ../sass/doable.scss */
+#block-system-user-menu li {
+  list-style: none;
+}
+
+/* SIDEBARS */
+/* line 375, ../sass/doable.scss */
 h2.pane-title {
   font-family: "MuseoSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333333;
@@ -2140,40 +2151,40 @@ h2.pane-title {
 }
 
 /* Browse Solutions */
-/* line 378, ../sass/doable.scss */
+/* line 391, ../sass/doable.scss */
 .ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited,
 .view-solutions-browse-by-tag a {
   color: #333333;
 }
 
-/* line 383, ../sass/doable.scss */
+/* line 396, ../sass/doable.scss */
 .view-solutions-browse-by-tag a:hover {
   color: #3D8901;
 }
 
-/* line 387, ../sass/doable.scss */
+/* line 400, ../sass/doable.scss */
 .view-solutions-browse-by-tag .views-row {
   margin-bottom: .25em;
 }
 
-/* line 395, ../sass/doable.scss */
+/* line 408, ../sass/doable.scss */
 .ui-accordion .ui-accordion-header a {
   padding-left: 1.5em;
 }
 
-/* line 400, ../sass/doable.scss */
+/* line 413, ../sass/doable.scss */
 .ui-accordion .ui-accordion-header .ui-icon {
   left: 0em;
 }
 
-/* line 404, ../sass/doable.scss */
+/* line 417, ../sass/doable.scss */
 .ui-accordion .ui-accordion-header a {
   padding-left: 1.25em;
   padding-top: .35em;
   padding-bottom: .25em;
 }
 
-/* line 411, ../sass/doable.scss */
+/* line 424, ../sass/doable.scss */
 .ui-state-default,
 .ui-state-active,
 .ui-widget-content .ui-state-default,
@@ -2183,7 +2194,7 @@ h2.pane-title {
   border: none;
 }
 
-/* line 435, ../sass/doable.scss */
+/* line 448, ../sass/doable.scss */
 .ui-state-active,
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active {
@@ -2195,7 +2206,7 @@ h2.pane-title {
   border-right-width-value: 0px;
 }
 
-/* line 446, ../sass/doable.scss */
+/* line 459, ../sass/doable.scss */
 .view-solutions-browse-by-tag .ui-corner-all {
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
@@ -2203,12 +2214,12 @@ h2.pane-title {
   border-top-right-radius: 0px;
 }
 
-/* line 454, ../sass/doable.scss */
+/* line 467, ../sass/doable.scss */
 h3.ui-state-active a {
   color: #3D8901 !important;
 }
 
-/* line 458, ../sass/doable.scss */
+/* line 471, ../sass/doable.scss */
 .view-solutions-browse-by-tag .ui-accordion-content {
   padding-top: 5px;
   padding-bottom: 0px;
@@ -2217,14 +2228,14 @@ h3.ui-state-active a {
   border: none;
 }
 
-/* line 466, ../sass/doable.scss */
+/* line 479, ../sass/doable.scss */
 .view-solutions-browse-by-tag .ui-corner-bottom {
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 }
 
 /* PAGER */
-/* line 476, ../sass/doable.scss */
+/* line 489, ../sass/doable.scss */
 div.item-list ul.pager {
   margin-top: 20px;
   border-top: dotted 1px #D6D6D6;
@@ -2235,14 +2246,14 @@ div.item-list ul.pager {
   padding-bottom: 20px;
 }
 
-/* line 486, ../sass/doable.scss */
+/* line 499, ../sass/doable.scss */
 div.item-list li.pager-item,
 div.item-list li.pager-current {
   margin: 0 5px;
   padding: 0;
 }
 
-/* line 492, ../sass/doable.scss */
+/* line 505, ../sass/doable.scss */
 div.item-list li.pager-item a,
 div.item-list li.pager-ellipsis,
 div.item-list li.pager-current {
@@ -2258,19 +2269,19 @@ div.item-list li.pager-current {
   padding: 13px 8px 10px;
 }
 
-/* line 509, ../sass/doable.scss */
+/* line 522, ../sass/doable.scss */
 div.item-list li.pager-current {
   color: #333333;
   background: url(../images/icon-pager-current.png) no-repeat center center;
 }
 
-/* line 515, ../sass/doable.scss */
+/* line 528, ../sass/doable.scss */
 div.item-list li.pager-item a:hover {
   color: #3D8901;
   border-style: none;
 }
 
-/* line 520, ../sass/doable.scss */
+/* line 533, ../sass/doable.scss */
 div.item-list ul.pager li.pager-current first {
   margin-left: 0px;
   margin-right: 15px;
@@ -2278,7 +2289,7 @@ div.item-list ul.pager li.pager-current first {
   font-size: 11px;
 }
 
-/* line 527, ../sass/doable.scss */
+/* line 540, ../sass/doable.scss */
 div.item-list ul.pager li.pager-previous {
   margin-left: 0px;
   margin-right: 0px;
@@ -2286,7 +2297,7 @@ div.item-list ul.pager li.pager-previous {
   font-size: 11px;
 }
 
-/* line 534, ../sass/doable.scss */
+/* line 547, ../sass/doable.scss */
 div.item-list ul.pager li.pager-next,
 div.item-list ul.pager li.pager-last {
   margin-left: 15px;
@@ -2295,19 +2306,19 @@ div.item-list ul.pager li.pager-last {
   font-size: 11px;
 }
 
-/* line 542, ../sass/doable.scss */
+/* line 555, ../sass/doable.scss */
 ul.pager li a.active,
 ul.pager a {
   color: #333333;
 }
 
-/* line 547, ../sass/doable.scss */
+/* line 560, ../sass/doable.scss */
 ul.pager li a.active:hover,
 ul.pager a:hover {
   color: #CCCCCC;
 }
 
-/* line 552, ../sass/doable.scss */
+/* line 565, ../sass/doable.scss */
 ul.pager li.pager-current {
   color: #3D8901;
 }
