@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Isotope Example feature.
+ */
+
+include_once('isotope_example_feature.features.inc');
