@@ -38,6 +38,10 @@ if (file_exists('/var/www/site-php')) {
   require('/var/www/site-php/doable/doable-settings.inc');
 }
 
+error_reporting(E_ALL);
+ini_set('display_errors', TRUE);
+ini_set('display_startup_errors', TRUE);
+
 if (file_exists('/var/www/site-php')) {
   require '/var/www/site-php/doableorg/doableorg-settings.inc';
 }
