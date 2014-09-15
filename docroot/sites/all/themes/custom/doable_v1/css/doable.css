@@ -2237,8 +2237,102 @@ h3.ui-state-active a {
   border-bottom-right-radius: 0px;
 }
 
-/* PAGER */
+/* PLACEHOLDER */
 /* line 492, ../sass/doable.scss */
+html {
+  height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* line 498, ../sass/doable.scss */
+body.page-welcome {
+  min-height: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: url(../images/bg-doable.jpg) no-repeat center center;
+  min-width: 640px;
+  min-height: 960px;
+}
+
+/* line 508, ../sass/doable.scss */
+body.page-welcome #page {
+  min-height: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+
+/* line 519, ../sass/doable.scss */
+body.page-welcome #page #main,
+body.page-welcome #page #main #content,
+body.page-welcome #page #main #content .panel-flexible,
+body.page-welcome #page #main #content .contextual-links-region {
+  min-height: 100% !important;
+  height: 100% !important;
+  max-width: 100%;
+  width: 100% !important;
+  padding-top: 0;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* line 533, ../sass/doable.scss */
+body.page-welcome #page #main #content .panel-flexible-inside,
+body.page-welcome #page #main #content .panel-flexible-inside,
+body.page-welcome #page #main #content .panels-flexible-region-first,
+body.page-welcome #page #main #content .panels-flexible-region-inside,
+body.page-welcome #page #main #content .pane-fieldable-panels-pane,
+body.page-welcome #page #main #content .fieldable-panels-pane,
+body.page-welcome #page #main #content .field-name-field-pane-body {
+  min-height: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* line 546, ../sass/doable.scss */
+body.page-welcome #page .panels-flexible-region-first {
+  background-color: #2c4460;
+  background-color: rgba(44, 68, 96, 0.8) !important;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#335184, endColorstr=#335184);
+  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#335184, endColorstr=#335184)";
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* line 556, ../sass/doable.scss */
+body.page-welcome #page .field-name-field-pane-body {
+  margin: 0 !important;
+}
+
+/* line 561, ../sass/doable.scss */
+body.page-welcome #page .field-name-field-pane-body .field-item {
+  background: url(../images/logo-doable.png) no-repeat top left;
+  padding-top: 80px;
+  margin-top: 40px !important;
+  margin-left: 40px !important;
+  margin-right: 40px !important;
+  overflow: scroll;
+}
+
+/* line 570, ../sass/doable.scss */
+body.page-welcome #page .field-name-field-pane-body p {
+  color: white;
+  font-family: "ProximaNova";
+  font-size: 16px;
+  line-height: 24px;
+  padding: .5em !important;
+  margin: 0 !important;
+}
+
+/* PAGER */
+/* line 584, ../sass/doable.scss */
 div.item-list ul.pager {
   margin-top: 20px;
   border-top: dotted 1px #D6D6D6;
@@ -2249,14 +2343,14 @@ div.item-list ul.pager {
   padding-bottom: 20px;
 }
 
-/* line 502, ../sass/doable.scss */
+/* line 594, ../sass/doable.scss */
 div.item-list li.pager-item,
 div.item-list li.pager-current {
   margin: 0 5px;
   padding: 0;
 }
 
-/* line 508, ../sass/doable.scss */
+/* line 600, ../sass/doable.scss */
 div.item-list li.pager-item a,
 div.item-list li.pager-ellipsis,
 div.item-list li.pager-current {
@@ -2272,19 +2366,19 @@ div.item-list li.pager-current {
   padding: 13px 8px 10px;
 }
 
-/* line 525, ../sass/doable.scss */
+/* line 617, ../sass/doable.scss */
 div.item-list li.pager-current {
   color: #333333;
   background: url(../images/icon-pager-current.png) no-repeat center center;
 }
 
-/* line 531, ../sass/doable.scss */
+/* line 623, ../sass/doable.scss */
 div.item-list li.pager-item a:hover {
   color: #3D8901;
   border-style: none;
 }
 
-/* line 536, ../sass/doable.scss */
+/* line 628, ../sass/doable.scss */
 div.item-list ul.pager li.pager-current first {
   margin-left: 0px;
   margin-right: 15px;
@@ -2292,7 +2386,7 @@ div.item-list ul.pager li.pager-current first {
   font-size: 11px;
 }
 
-/* line 543, ../sass/doable.scss */
+/* line 635, ../sass/doable.scss */
 div.item-list ul.pager li.pager-previous {
   margin-left: 0px;
   margin-right: 0px;
@@ -2300,7 +2394,7 @@ div.item-list ul.pager li.pager-previous {
   font-size: 11px;
 }
 
-/* line 550, ../sass/doable.scss */
+/* line 642, ../sass/doable.scss */
 div.item-list ul.pager li.pager-next,
 div.item-list ul.pager li.pager-last {
   margin-left: 15px;
@@ -2309,19 +2403,19 @@ div.item-list ul.pager li.pager-last {
   font-size: 11px;
 }
 
-/* line 558, ../sass/doable.scss */
+/* line 650, ../sass/doable.scss */
 ul.pager li a.active,
 ul.pager a {
   color: #333333;
 }
 
-/* line 563, ../sass/doable.scss */
+/* line 655, ../sass/doable.scss */
 ul.pager li a.active:hover,
 ul.pager a:hover {
   color: #CCCCCC;
 }
 
-/* line 568, ../sass/doable.scss */
+/* line 660, ../sass/doable.scss */
 ul.pager li.pager-current {
   color: #3D8901;
 }

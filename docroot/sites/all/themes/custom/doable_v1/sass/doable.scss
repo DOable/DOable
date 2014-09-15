@@ -487,6 +487,98 @@ h3.ui-state-active a {
 
 
 
+/* PLACEHOLDER */
+
+html{
+  height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body.page-welcome {
+  min-height: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: url(../images/bg-doable.jpg) no-repeat center center;
+  min-width: 640px;
+  min-height: 960px;
+}
+
+body.page-welcome #page {
+  min-height: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+
+body.page-welcome #page #main,
+body.page-welcome #page #main #content,
+body.page-welcome #page #main #content .panel-flexible,
+body.page-welcome #page #main #content .contextual-links-region {
+  min-height: 100% !important;
+  height: 100% !important;
+  max-width: 100%;
+  width: 100% !important;
+  padding-top: 0;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+
+body.page-welcome #page #main #content .panel-flexible-inside,
+body.page-welcome #page #main #content .panel-flexible-inside,
+body.page-welcome #page #main #content .panels-flexible-region-first,
+body.page-welcome #page #main #content .panels-flexible-region-inside,
+body.page-welcome #page #main #content .pane-fieldable-panels-pane,
+body.page-welcome #page #main #content .fieldable-panels-pane,
+body.page-welcome #page #main #content .field-name-field-pane-body {
+  min-height: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body.page-welcome #page .panels-flexible-region-first {
+  background-color: rgb(44, 68, 96);
+  background-color: rgba(44, 68, 96, 0.8) !important;
+  filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#335184, endColorstr=#335184);
+  -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#335184, endColorstr=#335184)"; 
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+
+body.page-welcome #page .field-name-field-pane-body {
+  margin: 0 !important;
+}
+
+
+body.page-welcome #page .field-name-field-pane-body .field-item {
+  background: url(../images/logo-doable.png) no-repeat top left;
+  padding-top: 80px;
+  margin-top: 40px !important;  
+  margin-left: 40px !important;  
+  margin-right: 40px !important;
+  overflow: scroll; 
+}
+
+body.page-welcome #page .field-name-field-pane-body p {
+  color: white;
+  font-family: $body-font;
+  font-size: 16px;
+  line-height: 24px;
+  padding: .5em !important;
+  margin: 0 !important;
+}
+
+
+
+
 /* PAGER */
 
 div.item-list ul.pager {
