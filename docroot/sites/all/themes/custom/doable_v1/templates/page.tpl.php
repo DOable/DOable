@@ -8,14 +8,25 @@
  */
 ?>
 
+
+<div id="header-wrapper">
+  <div id="page-header">
+
+    <header class="header" id="header" role="banner">
+      <?php print render($page['header']); ?>
+    </header>
+
+    <div id="navigation">
+      <?php print render($page['navigation']); ?>
+    </div>
+
+  </div>
+</div>
+
+
+
+
 <div id="page">
-
-  <header class="header" id="header" role="banner">
-
-
-    <?php print render($page['header']); ?>
-
-  </header>
 
   <div id="main">
 
@@ -37,11 +48,6 @@
       <?php print $feed_icons; ?>
     </div>
 
-    <div id="navigation">
-
-      <?php print render($page['navigation']); ?>
-
-    </div>
 
     <?php
       // Render the sidebars to see if there's anything in them.
@@ -57,9 +63,12 @@
     <?php endif; ?>
 
   </div>
-
-  <?php print render($page['footer']); ?>
-
 </div>
 
-<?php print render($page['bottom']); ?>
+
+<div id="footer-wrapper">
+  <div id="page-footer">
+    <?php print render($page['footer']); ?>
+    <?php print render($page['bottom']); ?>
+  </div>
+</div>

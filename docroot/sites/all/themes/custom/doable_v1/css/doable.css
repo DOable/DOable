@@ -594,6 +594,8 @@ table {
  */
 /* line 33, ../sass/layouts/_responsive.scss */
 #page,
+#page-header,
+#page-footer,
 .region-bottom {
   margin-left: auto;
   margin-right: auto;
@@ -601,7 +603,7 @@ table {
 }
 
 /* Apply the shared properties of grid items in a single, efficient ruleset. */
-/* line 41, ../sass/layouts/_responsive.scss */
+/* line 43, ../sass/layouts/_responsive.scss */
 #header,
 #content,
 #navigation,
@@ -636,14 +638,14 @@ table {
 
 /* Navigation bar */
 @media all and (min-width: 480px) {
-  /* line 60, ../sass/layouts/_responsive.scss */
+  /* line 62, ../sass/layouts/_responsive.scss */
   #main {
     /* Move all the children of #main down to make room. */
     padding-top: 3em;
     position: relative;
   }
 
-  /* line 65, ../sass/layouts/_responsive.scss */
+  /* line 67, ../sass/layouts/_responsive.scss */
   #navigation {
     /* Move the navbar up inside #main's padding. */
     position: absolute;
@@ -659,19 +661,19 @@ table {
   /**
    * The layout when there is only one sidebar, the left one.
    */
-  /* line 86, ../sass/layouts/_responsive.scss */
+  /* line 88, ../sass/layouts/_responsive.scss */
   .sidebar-first {
     /* Span 2 columns, starting in 2nd column from left. */
     /* Span 1 column, starting in 1st column from left. */
   }
-  /* line 88, ../sass/layouts/_responsive.scss */
+  /* line 90, ../sass/layouts/_responsive.scss */
   .sidebar-first #content {
     float: left;
     width: 200%;
     margin-left: 100%;
     margin-right: -300%;
   }
-  /* line 93, ../sass/layouts/_responsive.scss */
+  /* line 95, ../sass/layouts/_responsive.scss */
   .sidebar-first .region-sidebar-first {
     float: left;
     width: 100%;
@@ -682,19 +684,19 @@ table {
   /**
    * The layout when there is only one sidebar, the right one.
    */
-  /* line 101, ../sass/layouts/_responsive.scss */
+  /* line 103, ../sass/layouts/_responsive.scss */
   .sidebar-second {
     /* Span 2 columns, starting in 1st column from left. */
     /* Span 1 column, starting in 3rd column from left. */
   }
-  /* line 103, ../sass/layouts/_responsive.scss */
+  /* line 105, ../sass/layouts/_responsive.scss */
   .sidebar-second #content {
     float: left;
     width: 200%;
     margin-left: 0%;
     margin-right: -200%;
   }
-  /* line 108, ../sass/layouts/_responsive.scss */
+  /* line 110, ../sass/layouts/_responsive.scss */
   .sidebar-second .region-sidebar-second {
     float: left;
     width: 100%;
@@ -705,27 +707,27 @@ table {
   /**
    * The layout when there are two sidebars.
    */
-  /* line 116, ../sass/layouts/_responsive.scss */
+  /* line 118, ../sass/layouts/_responsive.scss */
   .two-sidebars {
     /* Span 2 columns, starting in 2nd column from left. */
     /* Span 1 column, starting in 1st column from left. */
     /* Start a new row and span all 3 columns. */
   }
-  /* line 118, ../sass/layouts/_responsive.scss */
+  /* line 120, ../sass/layouts/_responsive.scss */
   .two-sidebars #content {
     float: left;
     width: 200%;
     margin-left: 100%;
     margin-right: -300%;
   }
-  /* line 123, ../sass/layouts/_responsive.scss */
+  /* line 125, ../sass/layouts/_responsive.scss */
   .two-sidebars .region-sidebar-first {
     float: left;
     width: 100%;
     margin-left: 0%;
     margin-right: -100%;
   }
-  /* line 128, ../sass/layouts/_responsive.scss */
+  /* line 130, ../sass/layouts/_responsive.scss */
   .two-sidebars .region-sidebar-second {
     float: left;
     width: 300%;
@@ -739,7 +741,7 @@ table {
     /* Span 1 column, starting in the 2nd column from left. */
     /* Span 1 column, starting in the 3rd column from left. */
   }
-  /* line 134, ../sass/layouts/_responsive.scss */
+  /* line 136, ../sass/layouts/_responsive.scss */
   .two-sidebars .region-sidebar-second .block {
     padding-left: 10px;
     padding-right: 10px;
@@ -749,7 +751,7 @@ table {
     box-sizing: border-box;
     word-wrap: break-word;
   }
-  /* line 138, ../sass/layouts/_responsive.scss */
+  /* line 140, ../sass/layouts/_responsive.scss */
   .two-sidebars .region-sidebar-second .block:nth-child(3n+1) {
     float: left;
     width: 100%;
@@ -757,14 +759,14 @@ table {
     margin-right: -100%;
     clear: left;
   }
-  /* line 143, ../sass/layouts/_responsive.scss */
+  /* line 145, ../sass/layouts/_responsive.scss */
   .two-sidebars .region-sidebar-second .block:nth-child(3n+2) {
     float: left;
     width: 100%;
     margin-left: 100%;
     margin-right: -200%;
   }
-  /* line 147, ../sass/layouts/_responsive.scss */
+  /* line 149, ../sass/layouts/_responsive.scss */
   .two-sidebars .region-sidebar-second .block:nth-child(3n) {
     float: left;
     width: 100%;
@@ -779,19 +781,19 @@ table {
   /**
    * The layout when there is only one sidebar, the left one.
    */
-  /* line 164, ../sass/layouts/_responsive.scss */
+  /* line 166, ../sass/layouts/_responsive.scss */
   .sidebar-first {
     /* Span 4 columns, starting in 2nd column from left. */
     /* Span 1 column, starting in 1st column from left. */
   }
-  /* line 166, ../sass/layouts/_responsive.scss */
+  /* line 168, ../sass/layouts/_responsive.scss */
   .sidebar-first #content {
     float: left;
     width: 400%;
     margin-left: 100%;
     margin-right: -500%;
   }
-  /* line 171, ../sass/layouts/_responsive.scss */
+  /* line 173, ../sass/layouts/_responsive.scss */
   .sidebar-first .region-sidebar-first {
     float: left;
     width: 100%;
@@ -802,19 +804,19 @@ table {
   /**
    * The layout when there is only one sidebar, the right one.
    */
-  /* line 179, ../sass/layouts/_responsive.scss */
+  /* line 181, ../sass/layouts/_responsive.scss */
   .sidebar-second {
     /* Span 4 columns, starting in 1st column from left. */
     /* Span 1 column, starting in 5th column from left. */
   }
-  /* line 181, ../sass/layouts/_responsive.scss */
+  /* line 183, ../sass/layouts/_responsive.scss */
   .sidebar-second #content {
     float: left;
     width: 400%;
     margin-left: 0%;
     margin-right: -400%;
   }
-  /* line 186, ../sass/layouts/_responsive.scss */
+  /* line 188, ../sass/layouts/_responsive.scss */
   .sidebar-second .region-sidebar-second {
     float: left;
     width: 100%;
@@ -825,27 +827,27 @@ table {
   /**
    * The layout when there are two sidebars.
    */
-  /* line 194, ../sass/layouts/_responsive.scss */
+  /* line 196, ../sass/layouts/_responsive.scss */
   .two-sidebars {
     /* Span 3 columns, starting in 2nd column from left. */
     /* Span 1 column, starting in 1st column from left. */
     /* Span 1 column, starting in 5th column from left. */
   }
-  /* line 196, ../sass/layouts/_responsive.scss */
+  /* line 198, ../sass/layouts/_responsive.scss */
   .two-sidebars #content {
     float: left;
     width: 300%;
     margin-left: 100%;
     margin-right: -400%;
   }
-  /* line 201, ../sass/layouts/_responsive.scss */
+  /* line 203, ../sass/layouts/_responsive.scss */
   .two-sidebars .region-sidebar-first {
     float: left;
     width: 100%;
     margin-left: 0%;
     margin-right: -100%;
   }
-  /* line 206, ../sass/layouts/_responsive.scss */
+  /* line 208, ../sass/layouts/_responsive.scss */
   .two-sidebars .region-sidebar-second {
     float: left;
     width: 100%;
@@ -1793,7 +1795,7 @@ tr.selected td {
 /* @import "theme-B"; */
 /* VARIABLES */
 /* GENERAL */
-/* line 44, ../sass/doable.scss */
+/* line 47, ../sass/doable.scss */
 #page p {
   color: #333333;
   font-family: "ProximaNova";
@@ -1807,7 +1809,7 @@ tr.selected td {
   margin-bottom: 10px;
 }
 
-/* line 57, ../sass/doable.scss */
+/* line 60, ../sass/doable.scss */
 #page div {
   color: #333333;
   font-family: "ProximaNova";
@@ -1819,19 +1821,19 @@ tr.selected td {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* line 69, ../sass/doable.scss */
+/* line 72, ../sass/doable.scss */
 a {
   color: #3D8901;
   text-decoration: none;
 }
 
-/* line 74, ../sass/doable.scss */
+/* line 77, ../sass/doable.scss */
 a:hover {
   color: #333333;
   text-decoration: none;
 }
 
-/* line 80, ../sass/doable.scss */
+/* line 83, ../sass/doable.scss */
 h1 {
   font-family: "MuseoSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333333;
@@ -1847,8 +1849,9 @@ h1 {
   -moz-text-decoration-style: solid;
 }
 
-/* line 95, ../sass/doable.scss */
-h2 {
+/* line 98, ../sass/doable.scss */
+h2,
+#main h2.pane-title {
   font-family: "MuseoSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333333;
   font-size: 34px;
@@ -1858,8 +1861,15 @@ h2 {
   margin-bottom: 20px;
 }
 
-/* line 105, ../sass/doable.scss */
+/* line 109, ../sass/doable.scss */
+h2.page-title {
+  margin-bottom: 0px;
+}
+
+/* line 113, ../sass/doable.scss */
 h3 {
+  font-family: "MuseoSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 24px;
   display: block;
   margin-bottom: 8px;
   margin-left: 0;
@@ -1867,7 +1877,7 @@ h3 {
   margin-top: 12px;
 }
 
-/* line 113, ../sass/doable.scss */
+/* line 123, ../sass/doable.scss */
 h3 a {
   font-family: "MuseoSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #3D8901;
@@ -1881,7 +1891,28 @@ h3 a {
   -moz-text-decoration-style: solid;
 }
 
-/* line 126, ../sass/doable.scss */
+/* line 136, ../sass/doable.scss */
+h3.sub-title {
+  font-family: "MuseoSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #666666;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1.1;
+  text-decoration: none;
+  text-rendering: optimizelegibility;
+  -moz-text-decoration-color: -moz-use-text-color;
+  -moz-text-decoration-line: none;
+  -moz-text-decoration-style: solid;
+  margin-bottom: 20px;
+}
+
+/* line 150, ../sass/doable.scss */
+h4 {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+/* line 155, ../sass/doable.scss */
 .field .field-label,
 .field-label {
   font-family: "MuseoSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -1891,78 +1922,190 @@ h3 a {
   font-weight: normal;
 }
 
-/* line 135, ../sass/doable.scss */
+/* line 164, ../sass/doable.scss */
 .label-inline {
   float: left;
 }
 
-/* PAGE */
-/* line 142, ../sass/doable.scss */
-#main {
-  padding-top: 80px;
+/* line 169, ../sass/doable.scss */
+a.button-link,
+a.button-link:visited {
+  background-color: #3D8901;
+  padding: 4px 10px;
+  color: white;
+  text-align: center;
+  vertical-align: middle;
+  width: auto;
+  display: inline-block;
 }
 
+/* line 180, ../sass/doable.scss */
+a.button-link:hover {
+  color: #D6D6D6;
+}
+
+/* PAGE */
 /* HEADER */
-/* line 150, ../sass/doable.scss */
+/* line 196, ../sass/doable.scss */
+#header-wrapper {
+  width: 100%;
+  background-color: #F0F0F0;
+  border-bottom: solid 1px #CCCCCC;
+  height: 60px;
+}
+
+/* NAVIGATION */
+/* line 208, ../sass/doable.scss */
+.menu {
+  margin: 0;
+  padding-left: 0px;
+}
+
+/* line 213, ../sass/doable.scss */
+#navigation {
+  clear: both;
+  height: auto;
+  position: relative;
+}
+
+/* line 223, ../sass/doable.scss */
 #block-blockify-blockify-logo {
   float: left;
   margin-right: 20px;
+  margin-top: 8px;
 }
 
-/* line 155, ../sass/doable.scss */
+/* line 229, ../sass/doable.scss */
 #block-blockify-blockify-logo img {
   height: 40px;
   width: auto;
 }
 
-/* SEARCH */
-/* line 162, ../sass/doable.scss */
-#search-block-form {
+/* ARTICLES - Page */
+/* line 239, ../sass/doable.scss */
+body.node-type-article .field-name-field-article-image {
+  float: right;
+  margin-left: 20px;
+  margin-bottom: 20px;
+}
+
+/* FOOTER */
+/* line 250, ../sass/doable.scss */
+#footer-wrapper {
+  width: 100%;
+  background-color: #F0F0F0;
+  border-top: solid 1px #CCCCCC;
+  height: 220px;
+  margin-top: 60px;
+}
+
+/* line 258, ../sass/doable.scss */
+#block-menu-menu-footer-menu {
+  margin-top: 20px;
+}
+
+/* line 262, ../sass/doable.scss */
+#block-menu-menu-footer-menu ul {
+  padding-left: none;
+}
+
+/* line 266, ../sass/doable.scss */
+#block-menu-menu-footer-menu li {
+  list-style: none;
+}
+
+/* line 270, ../sass/doable.scss */
+#block-menu-menu-footer-menu li a {
+  color: #333333;
+  font-family: "ProximaNova";
+  font-size: 14px;
+}
+
+/* line 276, ../sass/doable.scss */
+#block-menu-menu-footer-menu li a:hover {
+  color: #3D8901;
+}
+
+/* line 280, ../sass/doable.scss */
+#block-boxes-footer {
   float: right;
 }
 
+/* line 284, ../sass/doable.scss */
+#block-boxes-footer p {
+  font-family: "ProximaNova";
+  font-size: 12px;
+}
+
+/* USER MENU */
+/* line 293, ../sass/doable.scss */
+#block-system-user-menu {
+  float: right;
+  margin: 0;
+  margin-top: 15px;
+  margin-left: 50px;
+}
+
+/* line 300, ../sass/doable.scss */
+#block-system-user-menu li {
+  list-style: none;
+  float: right;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+/* line 307, ../sass/doable.scss */
+#block-system-user-menu li a {
+  font-family: "ProximaNova";
+  font-size: 14px;
+}
+
 /* MAIN MENU */
-/* line 169, ../sass/doable.scss */
+/* line 318, ../sass/doable.scss */
 #block-system-main-menu {
   height: 60px;
   vertical-align: middle;
+  float: left;
+  margin-top: 15px;
+  margin-left: 15px;
 }
 
-/* line 174, ../sass/doable.scss */
-#main-menu li {
+/* line 326, ../sass/doable.scss */
+#block-system-main-menu li {
   padding-bottom: 14px;
-  padding-left: 15px;
-  padding-right: 15px;
+  margin-left: 15px;
+  margin-right: 15px;
   padding-top: 16px;
 }
 
-/* line 181, ../sass/doable.scss */
-#main-menu li a {
+/* line 333, ../sass/doable.scss */
+#block-system-main-menu li a {
   font-family: "MuseoSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 14px;
   color: #333333;
   text-decoration: none;
   font-weight: 500;
+  text-transform: uppercase;
 }
 
 /* SOLUTIONS */
-/* line 194, ../sass/doable.scss */
+/* line 347, ../sass/doable.scss */
 .view-solutions-teasers .view-content {
   margin-bottom: 20px;
 }
 
-/* line 198, ../sass/doable.scss */
+/* line 351, ../sass/doable.scss */
 .view-solutions-teasers .view-filters {
   border-top: dotted 1px #D6D6D6;
 }
 
-/* line 202, ../sass/doable.scss */
+/* line 355, ../sass/doable.scss */
 .view-solutions-teasers .view-content {
   border-top: dotted 1px #D6D6D6;
   padding-top: 20px;
 }
 
-/* line 207, ../sass/doable.scss */
+/* line 360, ../sass/doable.scss */
 .view-solutions-teasers .views-row,
 .node-solution.node-teaser {
   height: 190px;
@@ -1970,20 +2113,26 @@ h3 a {
   clear: both;
 }
 
-/* line 214, ../sass/doable.scss */
+/* line 367, ../sass/doable.scss */
 .view-solutions-teasers .views-field-field-solution-image,
 .node-solution.node-teaser .field-name-field-solution-image {
   float: left;
   margin-right: 20px;
 }
 
-/* line 220, ../sass/doable.scss */
+/* line 373, ../sass/doable.scss */
+.view-solutions-teasers .views-field-field-solution-image img,
+.node-solution.node-teaser .field-name-field-solution-image img {
+  border: 1px solid #D6D6D6;
+}
+
+/* line 379, ../sass/doable.scss */
 .node-solution.node-teaser .field-name-field-solution-subtitle,
 .node-solution.node-teaser .field-name-field-solution-teaser {
   margin-bottom: 8px;
 }
 
-/* line 225, ../sass/doable.scss */
+/* line 384, ../sass/doable.scss */
 .view-solutions-teasers .views-field-field-solution-sectors,
 .node-solution.node-teaser .sectors {
   display: inline-block;
@@ -1992,14 +2141,14 @@ h3 a {
   height: 12px;
 }
 
-/* line 233, ../sass/doable.scss */
+/* line 392, ../sass/doable.scss */
 .view-solutions-teasers .views-field-field-solution-sectors .field-content,
 .node-solution.node-teaser .sectors .inline-items {
   position: relative;
   top: -3px;
 }
 
-/* line 239, ../sass/doable.scss */
+/* line 398, ../sass/doable.scss */
 .view-solutions-teasers .views-field-field-solution-sectors a,
 .node-solution.node-teaser .sectors a {
   padding-top: 0px;
@@ -2010,13 +2159,13 @@ h3 a {
   text-transform: uppercase;
 }
 
-/* line 249, ../sass/doable.scss */
+/* line 408, ../sass/doable.scss */
 .view-solutions-teasers .views-field-field-solution-sectors a:hover,
 .node-solution.node-teaser .sectors a:hover {
   color: #3D8901;
 }
 
-/* line 254, ../sass/doable.scss */
+/* line 413, ../sass/doable.scss */
 .view-solutions-teasers .views-field-comment-count {
   padding-left: 20px;
   display: inline-block;
@@ -2024,7 +2173,7 @@ h3 a {
   background: url(../images/icon-comment.png) no-repeat left 2px;
 }
 
-/* line 262, ../sass/doable.scss */
+/* line 421, ../sass/doable.scss */
 .view-solutions-teasers .views-field-field-solution-tags {
   height: 18px;
   padding-left: 20px;
@@ -2033,13 +2182,13 @@ h3 a {
   background: url(../images/icon-tags.png) no-repeat left 2px;
 }
 
-/* line 270, ../sass/doable.scss */
+/* line 429, ../sass/doable.scss */
 .view-solutions-teasers .views-field-field-solution-tags a {
   font-size: 13px;
   line-height: 18px;
 }
 
-/* line 276, ../sass/doable.scss */
+/* line 435, ../sass/doable.scss */
 .view-solutions-teasers .views-field-comment-count span,
 .view-solutions-teasers .views-field-comment-count span a {
   font-family: "ProximaNova";
@@ -2048,14 +2197,14 @@ h3 a {
   line-height: 18px;
 }
 
-/* line 285, ../sass/doable.scss */
+/* line 444, ../sass/doable.scss */
 .view-solutions-teasers .views-field-field-solution-tags,
 .node-solution.node-teaser .tags {
   margin-bottom: 10px;
 }
 
 /* SOLUTIONS - Related Solutions */
-/* line 294, ../sass/doable.scss */
+/* line 453, ../sass/doable.scss */
 .field-name-field-solution-similar .field-label {
   font-family: "MuseoSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333333;
@@ -2066,7 +2215,7 @@ h3 a {
   border-bottom: dotted 1px #D6D6D6;
 }
 
-/* line 304, ../sass/doable.scss */
+/* line 463, ../sass/doable.scss */
 .view-mode-listing_preview {
   max-height: 100px;
   margin-bottom: 15px;
@@ -2074,120 +2223,166 @@ h3 a {
   padding-right: 10px;
 }
 
-/* line 311, ../sass/doable.scss */
+/* line 470, ../sass/doable.scss */
 .view-mode-listing_preview .field-name-field-solution-image {
   float: left;
   margin-right: 10px;
   clear: left;
 }
 
-/* line 317, ../sass/doable.scss */
+/* line 476, ../sass/doable.scss */
 .view-mode-listing_preview .field-name-title {
   margin-top: 10px;
 }
 
-/* NAVIGATION */
-/* line 325, ../sass/doable.scss */
-#navigation {
-  clear: both;
-  height: auto;
-}
-
-/* FOOTER */
-/* line 332, ../sass/doable.scss */
-#footer {
-  background-color: #F0F0F0;
-  border-top: solid 1px #CCCCCC;
-  height: 220px;
-}
-
-/* line 338, ../sass/doable.scss */
-#block-menu-menu-footer-menu ul {
-  padding-left: none;
-}
-
-/* line 342, ../sass/doable.scss */
-#block-menu-menu-footer-menu li {
-  list-style: none;
-}
-
-/* line 346, ../sass/doable.scss */
-#block-menu-menu-footer-menu li a {
-  color: #333333;
-}
-
-/* line 350, ../sass/doable.scss */
-#block-menu-menu-footer-menu li a:hover {
-  color: #3D8901;
-}
-
-/* line 354, ../sass/doable.scss */
-#block-boxes-footer {
-  float: right;
-}
-
-/* USER MENU */
-/* line 362, ../sass/doable.scss */
-#block-system-user-menu {
-  float: right;
-}
-
-/* line 366, ../sass/doable.scss */
-#block-system-user-menu li {
-  list-style: none;
-  float: right;
-  margin-left: 20px;
-  margin-right: 20px;
-}
-
 /* SIDEBARS */
-/* line 378, ../sass/doable.scss */
-h2.pane-title {
+/* line 489, ../sass/doable.scss */
+#main .sidebar h2.pane-title {
   font-family: "MuseoSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333333;
-  font-size: 30px;
-  font-weight: 100;
+  font-size: 24px;
+  font-weight: 200;
   padding-top: 10px;
-  padding-bottom: 10px;
+  padding-bottom: 5px;
   border-bottom: dotted 1px #D6D6D6;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+  display: block;
+  width: 100%;
 }
 
-/* Browse Solutions */
-/* line 394, ../sass/doable.scss */
+/* SIDEBARS - Add Solution */
+/* line 504, ../sass/doable.scss */
+.pane-block-1 p {
+  width: 100%;
+  display: block;
+}
+
+/* line 509, ../sass/doable.scss */
+.pane-block-1 a.button-link {
+  width: 100%;
+  background-color: #3D8901;
+  padding: 10px;
+  color: white;
+  display: block;
+  text-align: center;
+  font-size: 18px;
+}
+
+/* SIDEBAR - Trending Solutions */
+/* line 524, ../sass/doable.scss */
+.view-solutions-trending-sidebar .views-row {
+  width: 100%;
+  max-height: 100px;
+  margin-bottom: 15px;
+  border: solid 1px #D6D6D6;
+  padding-right: 10px;
+}
+
+/* line 532, ../sass/doable.scss */
+.view-solutions-trending-sidebar .views-field-field-solution-image {
+  float: left;
+  margin-right: 10px;
+  clear: left;
+  display: block;
+}
+
+/* line 539, ../sass/doable.scss */
+.view-solutions-trending-sidebar .views-field-title {
+  margin-top: 10px;
+  display: inline-block;
+}
+
+/* line 548, ../sass/doable.scss */
+.view-solutions-trending-sidebar .views-field-field-solution-teaser p {
+  font-size: 10px;
+}
+
+/* line 552, ../sass/doable.scss */
+.view-solutions-trending-sidebar .views-field-comment-count {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  padding-left: 20px;
+  margin-bottom: 8px;
+  background: url(../images/icon-comment.png) no-repeat left 2px;
+  position: relative;
+  top: -12px;
+}
+
+/* line 564, ../sass/doable.scss */
+.view-solutions-trending-sidebar .views-field-comment-count span,
+.view-solutions-trending-sidebar .views-field-comment-count span a {
+  font-family: "ProximaNova";
+  color: #333333;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+/* line 573, ../sass/doable.scss */
+.view-solutions-trending-sidebar .views-field-field-solution-tags {
+  height: 18px;
+  width: 0px;
+  padding-left: 16px;
+  display: inline-block;
+  margin-bottom: 8px;
+  background: url(../images/icon-tags.png) no-repeat left 2px;
+  overflow: hidden;
+}
+
+/* line 583, ../sass/doable.scss */
+.view-solutions-trending-sidebar .views-field-field-solution-tags a {
+  font-size: 13px;
+  line-height: 18px;
+}
+
+/* line 589, ../sass/doable.scss */
+.view-solutions-trending-sidebar .views-field-field-solution-sectors {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+}
+
+/* SIDEBAR - Browse Solutions */
+/* line 601, ../sass/doable.scss */
 .ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited,
 .view-solutions-browse-by-tag a {
   color: #333333;
 }
 
-/* line 399, ../sass/doable.scss */
-.view-solutions-browse-by-tag a:hover {
+/* line 606, ../sass/doable.scss */
+.view-solutions-browse-by-tag li a:hover {
   color: #3D8901;
 }
 
-/* line 403, ../sass/doable.scss */
+/* line 610, ../sass/doable.scss */
 .view-solutions-browse-by-tag .views-row {
   margin-bottom: .25em;
 }
 
-/* line 411, ../sass/doable.scss */
+/* line 618, ../sass/doable.scss */
+.view-solutions-browse-by-tag .view-footer {
+  margin-top: 10px;
+}
+
+/* line 622, ../sass/doable.scss */
 .ui-accordion .ui-accordion-header a {
   padding-left: 1.5em;
 }
 
-/* line 416, ../sass/doable.scss */
+/* line 627, ../sass/doable.scss */
 .ui-accordion .ui-accordion-header .ui-icon {
   left: 0em;
 }
 
-/* line 420, ../sass/doable.scss */
+/* line 631, ../sass/doable.scss */
 .ui-accordion .ui-accordion-header a {
   padding-left: 1.25em;
   padding-top: .35em;
   padding-bottom: .25em;
 }
 
-/* line 427, ../sass/doable.scss */
+/* line 637, ../sass/doable.scss */
 .ui-state-default,
 .ui-state-active,
 .ui-widget-content .ui-state-default,
@@ -2197,7 +2392,7 @@ h2.pane-title {
   border: none;
 }
 
-/* line 451, ../sass/doable.scss */
+/* line 659, ../sass/doable.scss */
 .ui-state-active,
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active {
@@ -2209,7 +2404,7 @@ h2.pane-title {
   border-right-width-value: 0px;
 }
 
-/* line 462, ../sass/doable.scss */
+/* line 670, ../sass/doable.scss */
 .view-solutions-browse-by-tag .ui-corner-all {
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
@@ -2217,12 +2412,12 @@ h2.pane-title {
   border-top-right-radius: 0px;
 }
 
-/* line 470, ../sass/doable.scss */
+/* line 677, ../sass/doable.scss */
 h3.ui-state-active a {
   color: #3D8901 !important;
 }
 
-/* line 474, ../sass/doable.scss */
+/* line 681, ../sass/doable.scss */
 .view-solutions-browse-by-tag .ui-accordion-content {
   padding-top: 5px;
   padding-bottom: 0px;
@@ -2231,21 +2426,21 @@ h3.ui-state-active a {
   border: none;
 }
 
-/* line 482, ../sass/doable.scss */
+/* line 689, ../sass/doable.scss */
 .view-solutions-browse-by-tag .ui-corner-bottom {
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 }
 
 /* PLACEHOLDER */
-/* line 492, ../sass/doable.scss */
+/* line 699, ../sass/doable.scss */
 html {
   height: 100% !important;
   padding: 0 !important;
   margin: 0 !important;
 }
 
-/* line 498, ../sass/doable.scss */
+/* line 705, ../sass/doable.scss */
 body.page-welcome {
   min-height: 100% !important;
   height: 100% !important;
@@ -2256,7 +2451,7 @@ body.page-welcome {
   min-height: 960px;
 }
 
-/* line 508, ../sass/doable.scss */
+/* line 715, ../sass/doable.scss */
 body.page-welcome #page {
   min-height: 100% !important;
   height: 100% !important;
@@ -2268,7 +2463,7 @@ body.page-welcome #page {
   padding-bottom: 0px;
 }
 
-/* line 519, ../sass/doable.scss */
+/* line 726, ../sass/doable.scss */
 body.page-welcome #page #main,
 body.page-welcome #page #main #content,
 body.page-welcome #page #main #content .panel-flexible,
@@ -2282,7 +2477,7 @@ body.page-welcome #page #main #content .contextual-links-region {
   margin: 0 !important;
 }
 
-/* line 533, ../sass/doable.scss */
+/* line 740, ../sass/doable.scss */
 body.page-welcome #page #main #content .panel-flexible-inside,
 body.page-welcome #page #main #content .panel-flexible-inside,
 body.page-welcome #page #main #content .panels-flexible-region-first,
@@ -2296,7 +2491,7 @@ body.page-welcome #page #main #content .field-name-field-pane-body {
   margin: 0 !important;
 }
 
-/* line 546, ../sass/doable.scss */
+/* line 753, ../sass/doable.scss */
 body.page-welcome #page .panels-flexible-region-first {
   background-color: #2c4460;
   background-color: rgba(44, 68, 96, 0.8) !important;
@@ -2306,12 +2501,12 @@ body.page-welcome #page .panels-flexible-region-first {
   margin: 0 !important;
 }
 
-/* line 556, ../sass/doable.scss */
+/* line 763, ../sass/doable.scss */
 body.page-welcome #page .field-name-field-pane-body {
   margin: 0 !important;
 }
 
-/* line 561, ../sass/doable.scss */
+/* line 768, ../sass/doable.scss */
 body.page-welcome #page .field-name-field-pane-body .field-item {
   background: url(../images/logo-doable.png) no-repeat top left;
   padding-top: 80px;
@@ -2321,7 +2516,7 @@ body.page-welcome #page .field-name-field-pane-body .field-item {
   overflow: scroll;
 }
 
-/* line 570, ../sass/doable.scss */
+/* line 777, ../sass/doable.scss */
 body.page-welcome #page .field-name-field-pane-body p {
   color: white;
   font-family: "ProximaNova";
@@ -2331,8 +2526,111 @@ body.page-welcome #page .field-name-field-pane-body p {
   margin: 0 !important;
 }
 
+/* SEARCH */
+/* line 793, ../sass/doable.scss */
+div#block-search-form {
+  margin-top: 15px;
+  float: right;
+}
+
+/* line 798, ../sass/doable.scss */
+form#search-block-form {
+  height: 30px;
+  margin: 0;
+  padding: 0;
+}
+
+/* line 805, ../sass/doable.scss */
+form#search-block-form .form-type-textfield {
+  width: 260px;
+  margin: 0px;
+  height: 26px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-right: none;
+  border-left: 1px solid #ABABAB;
+  border-top: 1px solid #ABABAB;
+  border-bottom: 1px solid #ABABAB;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+  display: inline-block;
+  float: left;
+  background-color: #FFF;
+}
+
+/* line 823, ../sass/doable.scss */
+#search-block-form .form-actions {
+  width: 32x;
+  height: 26px;
+  overflow: hidden !important;
+  background-color: #F0F0F0;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  top: -4x;
+  border-left: none;
+  border-right: 1px solid #ABABAB;
+  border-top: 1px solid #ABABAB;
+  border-bottom: 1px solid #ABABAB;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  display: inline-block;
+  float: left;
+}
+
+/* line 842, ../sass/doable.scss */
+#search-block-form input.form-text {
+  border: none;
+  outline: none;
+  line-height: 24px;
+  position: relative;
+  line-height: 26px \9;
+  color: #2b2b2b;
+  font-size: 11px;
+  background: transparent;
+  width: 256px;
+  height: 26px;
+  padding-left: 10px;
+  margin: 0;
+  padding: 0;
+  margin-left: 5px;
+  display: inline-block;
+  zoom: 1;
+}
+
+/* line 861, ../sass/doable.scss */
+#search-block-form input.form-submit {
+  border: none;
+  outline: none;
+  height: 26px;
+  width: 28px;
+  padding-left: 28px;
+  overflow: hidden !important;
+  background: url(../images/icon-search.png) no-repeat center left;
+}
+
+/* TAGS - Grid */
+/* line 876, ../sass/doable.scss */
+.view-tags-grid .item-list {
+  width: 33%;
+  display: inline-block;
+  vertical-align: top;
+}
+
+/* line 882, ../sass/doable.scss */
+.view-tags-grid ul {
+  margin-top: 0;
+  padding-left: 0;
+}
+
+/* line 887, ../sass/doable.scss */
+.view-tags-grid ul li {
+  list-style: none;
+}
+
 /* PAGER */
-/* line 584, ../sass/doable.scss */
+/* line 895, ../sass/doable.scss */
 div.item-list ul.pager {
   margin-top: 20px;
   border-top: dotted 1px #D6D6D6;
@@ -2343,14 +2641,14 @@ div.item-list ul.pager {
   padding-bottom: 20px;
 }
 
-/* line 594, ../sass/doable.scss */
+/* line 905, ../sass/doable.scss */
 div.item-list li.pager-item,
 div.item-list li.pager-current {
   margin: 0 5px;
   padding: 0;
 }
 
-/* line 600, ../sass/doable.scss */
+/* line 911, ../sass/doable.scss */
 div.item-list li.pager-item a,
 div.item-list li.pager-ellipsis,
 div.item-list li.pager-current {
@@ -2366,19 +2664,19 @@ div.item-list li.pager-current {
   padding: 13px 8px 10px;
 }
 
-/* line 617, ../sass/doable.scss */
+/* line 928, ../sass/doable.scss */
 div.item-list li.pager-current {
   color: #333333;
   background: url(../images/icon-pager-current.png) no-repeat center center;
 }
 
-/* line 623, ../sass/doable.scss */
+/* line 934, ../sass/doable.scss */
 div.item-list li.pager-item a:hover {
   color: #3D8901;
   border-style: none;
 }
 
-/* line 628, ../sass/doable.scss */
+/* line 939, ../sass/doable.scss */
 div.item-list ul.pager li.pager-current first {
   margin-left: 0px;
   margin-right: 15px;
@@ -2386,7 +2684,7 @@ div.item-list ul.pager li.pager-current first {
   font-size: 11px;
 }
 
-/* line 635, ../sass/doable.scss */
+/* line 946, ../sass/doable.scss */
 div.item-list ul.pager li.pager-previous {
   margin-left: 0px;
   margin-right: 0px;
@@ -2394,7 +2692,7 @@ div.item-list ul.pager li.pager-previous {
   font-size: 11px;
 }
 
-/* line 642, ../sass/doable.scss */
+/* line 953, ../sass/doable.scss */
 div.item-list ul.pager li.pager-next,
 div.item-list ul.pager li.pager-last {
   margin-left: 15px;
@@ -2403,19 +2701,19 @@ div.item-list ul.pager li.pager-last {
   font-size: 11px;
 }
 
-/* line 650, ../sass/doable.scss */
+/* line 961, ../sass/doable.scss */
 ul.pager li a.active,
 ul.pager a {
   color: #333333;
 }
 
-/* line 655, ../sass/doable.scss */
+/* line 966, ../sass/doable.scss */
 ul.pager li a.active:hover,
 ul.pager a:hover {
   color: #CCCCCC;
 }
 
-/* line 660, ../sass/doable.scss */
+/* line 971, ../sass/doable.scss */
 ul.pager li.pager-current {
   color: #3D8901;
 }
