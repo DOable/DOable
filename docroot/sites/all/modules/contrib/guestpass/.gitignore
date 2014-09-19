@@ -1,0 +1,6 @@
+
+# Ignore IDE projectfiles.
+.project
+.settings
+.settings/*
+

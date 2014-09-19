@@ -1,0 +1,60 @@
+<?php
+
+/**
+ * @file
+ * Registration Invite Module
+ */
+
+/**
+ * Implements hook_form_alter().
+ */
+function registration_invite_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'user_admin_settings') {
+    $item = menu_get_item('user/register');
+    if (in_array($item['access_callback'], array('registration_invite_user_register_access', 'user_register_access'))) {
+      // Provide an option at User account settings page.
+      $form['registration_cancellation']['user_register']['#options']['invite_only'] = t('New user registration by invitation only.');
+    }
+  }
+}
+
+/**
+ * Implements hook_menu_alter().
+ */
+function registration_invite_menu_alter(&$items) {
+  if (registration_invite_user_registration_by_invite_only()) {
+    /* Grant permission,
+    if this option "New user registration by invitation only." is selected,
+    at User account settings page.*/
+    $items['user/register']['access callback'] = 'registration_invite_user_register_access';
+  }
+}
+
+/**
+ * Returns true if "New user registration by invitation only." is selected.
+ */
+function registration_invite_user_registration_by_invite_only() {
+  return (variable_get('user_register', 1) === 'invite_only');
+}
+
+/**
+ * Permission defination "registration_invite_user_register_access".
+ */
+function registration_invite_user_register_access() {
+  $access = TRUE;
+  if (!isset($_COOKIE[REFERRAL_COOKIE])) {
+    $invite = invite_load_from_session();
+    if ((!$invite) && (!user_access('administer users'))) {
+      if (arg(1) === 'register') {
+        $access = FALSE;
+      }
+    }
+  }
+  if ($access) {
+    return user_register_access();
+  }
+  else {
+    drupal_set_message(t('Registrations are closed!<br/>New registrations are only allowed through invitations.'));
+    return FALSE;
+  }
+}
