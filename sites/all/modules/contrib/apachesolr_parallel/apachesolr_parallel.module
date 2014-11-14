@@ -1,0 +1,379 @@
+<?php
+/**
+ * @file
+ * Adds functionality to allow parallel processing for Solr indexing.
+ */
+
+function apachesolr_parallel_form_apachesolr_settings_alter(&$form, &$form_state) {
+  // Set the number of items to index per batch.
+  $num_cpu_options = drupal_map_assoc(array(1, 2, 3, 4, 5, 6, 7, 8));
+  $form['advanced']['apachesolr_parallel_num_cpu'] = array(
+    '#type' => 'select',
+    '#title' => t('Select the amount of CPUs you have available'),
+    '#options' => $num_cpu_options,
+    '#default_value' => variable_get('apachesolr_parallel_num_cpu', 2),
+  );
+  $form['advanced']['apachesolr_cron_limit']['#options']['500'] = 500;
+  $form['advanced']['apachesolr_cron_limit']['#options']['1000'] = 1000;
+  $form['advanced']['apachesolr_cron_limit']['#options']['1500'] = 1500;
+  $form['advanced']['apachesolr_cron_limit']['#options']['2000'] = 2000;
+}
+
+/**
+ * Implements hook_batch_alter().
+ * @param array $batch
+ */
+function apachesolr_parallel_batch_alter(&$batch) {
+  if ($batch['sets']['0']['operations']['0']['0'] == 'apachesolr_index_batch_index_entities') {
+    $batch['sets']['0']['operations']['0']['0'] = 'apachesolr_parallel_index_batch_index_entities';
+  }
+}
+
+/**
+ * Batch operation callback.
+ *
+ * @param $env_id
+ *  The id of the indexing environment.
+ * @param $context
+ *  Batch data to pass through to subsequent batches.
+ */
+function apachesolr_parallel_index_batch_index_entities($env_id, $total_limit = NULL, &$context) {
+  module_load_include('inc', 'apachesolr', 'apachesolr.index');
+  if (empty($context['sandbox'])) {
+    try {
+      // Get the $solr object.
+      $solr = apachesolr_get_solr($env_id);
+      // If there is no server available, don't continue.
+      if (!$solr->ping()) {
+        throw new Exception(t('No Solr instance available during indexing.'));
+      }
+    }
+    catch (Exception $e) {
+      watchdog('Apache Solr', $e->getMessage(), NULL, WATCHDOG_ERROR);
+      return FALSE;
+    }
+
+    $status = apachesolr_index_status($env_id);
+    $context['sandbox']['progress'] = 0;
+    $context['sandbox']['submitted'] = 0;
+
+    // How many items do we want to index? All or a limited set of items
+    if (empty($total_limit)) {
+      $context['sandbox']['max'] = $status['remaining'];
+    }
+    else {
+      $context['sandbox']['max'] = $total_limit;
+    }
+  }
+
+  // We can safely process the apachesolr_cron_limit nodes at a time without a
+  // timeout or out of memory error.
+  $limit = variable_get('apachesolr_cron_limit', 50);
+
+  if ($context['sandbox']['max'] >= $context['sandbox']['progress'] + $limit) {
+    $context['sandbox']['progress'] += $limit;
+  }
+  else {
+    $context['sandbox']['progress'] = $context['sandbox']['max'];
+  }
+  $context['sandbox']['submitted'] += apachesolr_parallel_index_entities($env_id, $limit);
+
+  $arguments = array(
+    '@current' => $context['sandbox']['progress'],
+    '@total' => $context['sandbox']['max'],
+    '@submitted' => $context['sandbox']['submitted'],
+  );
+  $context['message'] = t('Inspected @current of @total entities. Submitted @submitted documents to Solr in parallel', $arguments);
+
+  // Inform the batch engine that we are not finished, and provide an
+  // estimate of the level of completion reached.
+  $context['finished'] = empty($context['sandbox']['max']) ? 1 : $context['sandbox']['progress'] / $context['sandbox']['max'];
+
+  // Put the total into the results section when we're finished so we can
+  // show it to the admin.
+  if ($context['finished']) {
+    $context['results']['count'] = $context['sandbox']['progress'];
+    $context['results']['submitted'] = $context['sandbox']['submitted'];
+  }
+}
+
+/**
+ * Wrapper for indexing documents to simplify the httprl callback.
+ *
+ * @param type $rows
+ * @param type $entity_type
+ * @param type $env_id
+ * @return type
+ */
+function apachesolr_parallel_index_entities_document_wrapper($rows = array(), $entity_type = 'node', $env_id = 'solr') {
+  // Disable all caching.
+  apachesolr_parallel_cache_disable();
+
+  module_load_include('inc', 'apachesolr', 'apachesolr.index');
+  $documents = array();
+  // We explicitly do not work with excludes or other hook invocations
+  // as this could dramatically decrease the speed.
+
+  foreach ($rows as $row) {
+    $documents_row = apachesolr_index_entities_document($row, $entity_type, $env_id);
+    $documents = array_merge($documents_row, $documents);
+  }
+  $indexed = apachesolr_index_send_to_solr($env_id, $documents);
+  $documents_submitted = 0;
+  if ($indexed !== FALSE) {
+    $documents_submitted = count($documents);
+  }
+
+  // Enable all caching again.
+  apachesolr_parallel_cache_enable();
+
+  return $documents_submitted;
+}
+
+/**
+ *  Perform the entity indexing.
+ *
+ * @param $env_id
+ *  The id for the indexing environment.
+ * @param $limit
+ *  The number of items to process.
+ */
+function apachesolr_parallel_index_entities($env_id, $limit) {
+  // Don't forget - variable_set('httprl_server_addr', -1) .
+  module_load_include('inc', 'apachesolr', 'apachesolr.index');
+
+  // Disable all caching.
+  apachesolr_parallel_cache_disable();
+
+  $documents_submitted = 0;
+  foreach (entity_get_info() as $entity_type => $info) {
+    $documents = array();
+    $return_values = array();
+
+    // Get the position of the last item indexed.
+    $index_position = apachesolr_get_last_index_position($env_id, $entity_type);
+    $max_changed = $index_position['last_changed'];
+    $max_entity_id = $index_position['last_entity_id'];
+
+    // Divide the batch into a variable-set number of items per thread.
+    $amount_of_cpu = variable_get('apachesolr_parallel_num_cpu', 2);
+    $amount_per_thread = round($limit/$amount_of_cpu);
+    $amount_of_threads = ceil($limit/$amount_per_thread);
+
+    // Set long time-outs since we can wait patiently
+    // Make sure our calculation of timeouts is defined by the amount of cpus
+    $timeout = 360;
+    $global_timeout = 360 * $amount_of_threads;
+
+    $options = array(
+      'domain_connections' => $amount_of_threads,
+      'global_timeout' => $global_timeout,
+      'timeout' => $timeout,
+    );
+
+    // With each pass through the callback, retrieve the next group of nids.
+    $data_to_process = FALSE;
+    for ($i = 0; $i < $amount_of_threads; $i++) {
+      $rows_in_thread = apachesolr_parallel_index_get_entities_to_index($env_id, $entity_type, $amount_per_thread, $amount_per_thread * $i);
+      if (!empty($rows_in_thread)) {
+        $data_to_process = TRUE;
+        $return_values[$i] = '';
+        $callback_options = array(
+          array(
+            // This function will be called in parallel.
+            'function' => 'apachesolr_parallel_index_entities_document_wrapper',
+            // Store the return value here.
+            'return' => &$return_values[$i],
+            // Set up the options array.
+            'options' => $options,
+          ),
+          // Pass these in as arguments to the callback.
+          $rows_in_thread,
+          $entity_type,
+          $env_id,
+        );
+        // Queue the callback.
+        httprl_queue_background_callback($callback_options);
+
+        // Record the last item position.
+        foreach ($rows_in_thread as $row) {
+          if (!empty($row->status)) {
+            if ($row->changed > $max_changed) {
+              $max_changed = $row->changed;
+            }
+            if ($row->entity_id > $max_entity_id) {
+              $max_entity_id = $row->entity_id;
+            }
+          }
+        }
+      }
+    }
+
+    // Only spin up the thread if we've got data to process.
+    if ($data_to_process) {
+      $response = httprl_send_request();
+      if ($response === FALSE || count($response)>0) {
+        if ($response === FALSE) {
+          watchdog('Apache Solr Parallel', 'Failed to start background tasks' , NULL, WATCHDOG_ERROR);
+        }
+        else {
+          // Display the error message of only the first one
+          $result = array_shift(array_values($response));
+          watchdog('Apache Solr Parallel', $result->error , NULL, WATCHDOG_ERROR);
+        }
+      }
+      else {
+        // Update the last item processed.
+        apachesolr_set_last_index_position($env_id, $entity_type, $max_changed, $max_entity_id);
+        apachesolr_set_last_index_updated($env_id, REQUEST_TIME);
+      }
+
+      foreach ($return_values as $documents_submitted_per_thread) {
+        if (!empty($documents_submitted_per_thread)) {
+          $documents_submitted += $documents_submitted_per_thread;
+        }
+      }
+    }
+  }
+  // Enable all caching again.
+  apachesolr_parallel_cache_enable();
+
+  return $documents_submitted;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function apachesolr_parallel_form_apachesolr_index_action_form_alter(&$form_state, $env_id) {
+  $form_state['action']['cron']['#submit'] = array('apachesolr_parallel_index_action_form_cron_submit');
+}
+
+/**
+ * Submit handler for the deletion form.
+ */
+function apachesolr_parallel_index_action_form_cron_submit($form, &$form_state) {
+  if (!empty($form_state['build_info']['args'][0])) {
+    $env_id = $form_state['build_info']['args'][0];
+  }
+  else {
+    $env_id = apachesolr_default_environment();
+  }
+  // $form_state['storage'] must be unset for redirection to occur. Otherwise
+  // $form_state['rebuild'] is automatically set and this form will be
+  // rebuilt.
+  unset($form_state['storage']);
+  $form_state['redirect'] = 'admin/config/search/apachesolr';
+  apachesolr_parallel_cron($env_id);
+  drupal_set_message(t('Apachesolr cron succesfully executed'));
+}
+
+/**
+ * Implements hook_cron().
+ *
+ * @todo See if we can add info to the content type array for the cron_check.
+ */
+function apachesolr_parallel_cron($env_id = NULL) {
+  // We run the indexing process only for the default environment.
+  if (empty($env_id)) {
+    $env_id = apachesolr_default_environment();
+  }
+  // If Solr is set to read-only mode within Drupal, do not update, delete,
+  // or optimize during cron.
+  if (apachesolr_environment_variable_get($env_id, 'apachesolr_read_only', APACHESOLR_READ_WRITE) == APACHESOLR_READ_ONLY) {
+    return;
+  }
+  module_load_include('inc', 'apachesolr', 'apachesolr.index');
+
+  // We can safely process the apachesolr_cron_limit nodes at a time without a
+  // timeout or out of memory error.
+  $limit = variable_get('apachesolr_cron_limit', 50);
+  apachesolr_parallel_index_entities($env_id, $limit);
+}
+
+/**
+ * Return an array of rows from a query based on an indexing environment.
+ *
+ * @param $env_id
+ *  The id for the indexing environment.
+ * @param $entity_type
+ *  The entity type to retrieve.
+ * @param $limit
+ *  The maximum number of items to return.
+ * @param $from
+ *  The number of the last result processed.
+ *
+ * @todo Remove the read only because it is not environment-specific.
+ */
+function apachesolr_parallel_index_get_entities_to_index($env_id, $entity_type, $limit, $from = 0) {
+  $rows = array();
+  if (variable_get('apachesolr_read_only', 0)) {
+    return $rows;
+  }
+  $bundles = apachesolr_get_index_bundles($env_id, $entity_type);
+  if (empty($bundles)) {
+    return $rows;
+  }
+
+  $table = apachesolr_get_indexer_table($entity_type);
+
+  // Get $last_entity_id and $last_changed.
+  extract(apachesolr_get_last_index_position($env_id, $entity_type));
+
+  // Find the next batch of entities to index for this entity type.  Note that
+  // for ordering we're grabbing the oldest first and then ordering by ID so
+  // that we get a definitive order.
+  $query = "SELECT * FROM {{$table}} aie
+    WHERE (aie.bundle IN (:bundles))
+    AND (
+      (aie.changed > :last_changed) OR ((aie.changed <= :last_changed) AND (aie.entity_id > :last_entity_id))
+    )";
+  $arguments = array(
+    ':bundles' => $bundles,
+    ':last_changed' => $last_changed,
+    ':last_entity_id' => $last_entity_id,
+  );
+  if ($table == 'apachesolr_index_entities') {
+    // Other, entity-specific tables don't need this condition.
+    $query .= " AND aie.entity_type = :entity_type";
+    $arguments[':entity_type'] = $entity_type;
+  }
+  $query .= " ORDER BY aie.entity_id ASC";
+  $query = db_query_range($query, $from, $limit, $arguments);
+  $records = $query->fetchAllAssoc('entity_id');
+
+  // We omit the status callback since it is very slow.
+  return $records;
+}
+
+/**
+ * Temporarily disable caching during indexing.
+ */
+function apachesolr_parallel_cache_disable() {
+  if (!class_exists('DrupalFakeCache')) {
+    $GLOBALS['conf']['cache_backends'][] = 'includes/cache-install.inc';
+  }
+  // Store the existing cache value if available.
+  foreach (array('cache_default_class', 'cache_class_cache_form') as $cache) {
+    if (isset($GLOBALS['conf'][$cache])) {
+      $GLOBALS['conf'][$cache . '_original'] = $GLOBALS['conf'][$cache];
+    }
+  }
+  $GLOBALS['conf']['cache_default_class'] = 'DrupalFakeCache';
+  // Rely on the DB cache for form caching - otherwise forms fail.
+  $GLOBALS['conf']['cache_class_cache_form'] = 'DrupalDatabaseCache';
+}
+
+/**
+ * Re-enable caching after indexing.
+ */
+function apachesolr_parallel_cache_enable() {
+  // Reset the original cache.
+  foreach (array('cache_default_class', 'cache_class_cache_form') as $cache) {
+    if (isset($GLOBALS['conf'][$cache  . '_original'])) {
+      $GLOBALS['conf'][$cache] = $GLOBALS['conf'][$cache  . '_original'];
+    }
+    else {
+      unset($GLOBALS['conf'][$cache]);
+    }
+  }
+}

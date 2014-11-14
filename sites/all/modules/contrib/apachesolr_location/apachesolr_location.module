@@ -1,0 +1,279 @@
+<?php
+
+/**
+ * @file
+ * Implements indexing of location fields.
+ *
+ * By default location fields don't get indexed. Here apachesolr hooks and
+ * facetapi hooks are used to index the location field.
+ */
+
+/**
+ * Maps the location field to a solr definition
+ * @return array
+ *   $mappings is an array containing all the field mappings.
+ */
+function apachesolr_location_apachesolr_field_mappings() {
+  $fields = field_info_fields();
+  $mappings = array();
+  foreach ($fields as $field) {
+    if ($field['type'] == 'location') {
+      $mappings['per-field'][$field['field_name']] = array(
+        // REQUIRED FIELDS.
+        // Function callback to return the value that will be put in the
+        // solr index.
+        'indexing_callback' => 'apachesolr_location_fields_indexing_callback',
+        'map callback' => 'apachesolr_location_map_callback',
+        // NON REQUIRED FIELDS.
+        // See apachesolr_index_key() for the correct type. Defaults string.
+        'index_type' => 'location',
+        // We do not want default facet for the lat/lon until there is a widget
+        // that can support this (Slider?)
+        'facets' => FALSE,
+        'multiple' => FALSE,
+        'query types' => array('term','geo'),
+      );
+    }
+  }
+  return $mappings;
+}
+
+function apachesolr_location_ctools_plugin_post_alter(&$widget, &$plugin_type_info) {
+  if (!empty($plugin_type_info['hook']) && $plugin_type_info['hook'] == "facetapi_widgets") {
+    $widget['handler']['query types'][] = 'geo';
+  }
+}
+
+/**
+ * Takes the values from the field and tells the module where to put them
+ *
+ * @param object $entity
+ *   An object containing the entity that will get indexed.
+ * @param string $field_name
+ *   A string containing the name of the location field.
+ * @param string $index_key
+ *   A string containing the solr index field name.
+ * @param array $field_info
+ *   Array.
+ *
+ * @return array
+ *   An array containing all the fields that needs to be indexed.
+ */
+function apachesolr_location_fields_indexing_callback($entity, $field_name, $index_key, $field_info) {
+  variable_set('apachesolr_index_user', 1);
+  $fields = array();
+  // Check if it is profile2 specific
+  $is_profile2 = NULL;
+  if (function_exists('profile2_type_load')) {
+    $is_profile2 = profile2_type_load($entity->type);
+    if (!empty($is_profile2)) {
+      $entity_type = 'profile2';
+    }
+  }
+  else {
+    $entity_type = $entity->type;
+  }
+
+  if (!empty($entity->$field_name)) {
+    // field_get_items does not work as expected...
+    $field_location = $entity->{$field_name}[LANGUAGE_NONE];
+    if (!empty($field_location)) {
+      foreach ($field_location as $delta => $item) {
+        // Latitude/Longitude indexing.
+        if (isset($item['latitude']) && isset($item['longitude'])) {
+          $fields[] = array(
+            'key' => $index_key,
+            'value' => implode(',', array($item['latitude'], $item['longitude'])),
+          );
+        }
+
+        // City.
+        if (!empty($item['city'])) {
+          $field = array('index_type' => 'string', 'name' => 'locs_city', 'multiple' => TRUE);
+          $field_index_key = apachesolr_index_key($field);
+          $fields[] = array(
+            'key' => $field_index_key,
+            'value' => $item['city'],
+          );
+        }
+
+        // Postal code.
+        if (!empty($item['postal_code'])) {
+          $field = array('index_type' => 'string', 'name' => 'locs_postal_code', 'multiple' => TRUE);
+          $field_index_key = apachesolr_index_key($field);
+          $fields[] = array(
+            'key' => $field_index_key,
+            'value' => $item['postal_code'],
+          );
+        }
+
+        // Province.
+        if (!empty($item['province'])) {
+          $field = array('index_type' => 'string', 'name' => 'locs_province', 'multiple' => TRUE);
+          $field_index_key = apachesolr_index_key($field);
+          $fields[] = array(
+            'key' => $field_index_key,
+            'value' => $item['province'],
+          );
+        }
+
+        // Province name.
+        if (!empty($item['province_name'])) {
+          $field = array('index_type' => 'string', 'name' => 'locs_province_name', 'multiple' => TRUE);
+          $field_index_key = apachesolr_index_key($field);
+          $fields[] = array(
+            'key' => $field_index_key,
+            'value' => $item['province_name'],
+          );
+        }
+
+        // Country.
+        if (!empty($item['country'])) {
+          $field = array('index_type' => 'string', 'name' => 'locs_country', 'multiple' => TRUE);
+          $field_index_key = apachesolr_index_key($field);
+          $fields[] = array(
+            'key' => $field_index_key,
+            'value' => $item['country'],
+          );
+        }
+
+        // Country name.
+        if (!empty($item['country_name'])) {
+          $field = array('index_type' => 'string', 'name' => 'locs_country_name', 'multiple' => TRUE);
+          $field_index_key = apachesolr_index_key($field);
+          $fields[] = array(
+            'key' => $field_index_key,
+            'value' => $item['country_name'],
+          );
+        }
+      }
+    }
+  }
+
+  return $fields;
+}
+
+/**
+ * Implements hook_facetapi_facet_info().
+ * Provides the definitions for the extra facets.
+ *
+ * @param array $searcher_info
+ *   The definition of the searcher that facets are being collected for.
+ *
+ * @return array
+ *   An associative array keyed by unique name of the facet.
+ */
+function apachesolr_location_facetapi_facet_info($searcher_info) {
+  $facets = array();
+  $searcher_info = facetapi_get_searcher_info();
+
+  $facets['city'] = array(
+    'name' => 'city',
+    'label' => t('City'),
+    'description' => t('Filter by city.'),
+    'field' => 'sm_locs_city',
+    'field alias' => 'city',
+    'field api bundles' => array('node'),
+    'facet mincount allowed' => TRUE,
+    'dependency plugins' => array('bundle', 'role'),
+  );
+
+  $facets['postal_code'] = array(
+    'name' => 'postal_code',
+    'label' => t('Zip code'),
+    'description' => t('Filter by zip code.'),
+    'field' => 'sm_locs_postal_code',
+    'field alias' => 'postal_code',
+    'field api bundles' => array('node'),
+    'facet mincount allowed' => TRUE,
+    'dependency plugins' => array('bundle', 'role'),
+  );
+
+  $facets['province'] = array(
+    'name' => 'province',
+    'label' => t('Province'),
+    'description' => t('Filter by province code.'),
+    'field' => 'sm_locs_province',
+    'field alias' => 'province',
+    'field api bundles' => array('node'),
+    'facet mincount allowed' => TRUE,
+    'dependency plugins' => array('bundle', 'role'),
+  );
+
+  $facets['province_name'] = array(
+    'name' => 'province_name',
+    'label' => t('Province name'),
+    'description' => t('Filter by province name.'),
+    'field' => 'sm_locs_province_name',
+    'field alias' => 'province_name',
+    'field api bundles' => array('node'),
+    'facet mincount allowed' => TRUE,
+    'dependency plugins' => array('bundle', 'role'),
+  );
+
+  $facets['country'] = array(
+    'name' => 'country',
+    'label' => t('Country'),
+    'description' => t('Filter by country code.'),
+    'field' => 'sm_locs_country',
+    'field alias' => 'country',
+    'field api bundles' => array('node'),
+    'facet mincount allowed' => TRUE,
+    'dependency plugins' => array('bundle', 'role'),
+  );
+
+  $facets['country_name'] = array(
+    'name' => 'country_name',
+    'label' => t('Country name'),
+    'description' => t('Filter by country name.'),
+    'field' => 'sm_locs_country_name',
+    'field alias' => 'country_name',
+    'field api bundles' => array('node'),
+    'facet mincount allowed' => TRUE,
+    'dependency plugins' => array('bundle', 'role'),
+  );
+
+  $facets['range'] = array(
+    'name' => 'range',
+    'label' => t('Range'),
+    'description' => t('Filter by range.'),
+    'field' => 'locs_field_location',
+    'field alias' => 'range',
+    'field api bundles' => array('node'),
+    'facet mincount allowed' => TRUE,
+    'dependency plugins' => array('bundle', 'role'),
+    'query types' => array('geo'),
+  );
+
+  return $facets;
+}
+
+/**
+ * Implements hook_facetapi_widgets().
+ */
+function apachesolr_location_facetapi_widgets() {
+  return array(
+    'facetapi_location' => array(
+      'handler' => array(
+        'label' => t('Location'),
+        'class' => 'FacetapiWidgetLocation',
+        'query types' => array('geo'),
+      ),
+    ),
+  );
+}
+
+/**
+ * Map of the facet labels.
+ *
+ * @param array $values
+ * @param array $options
+ * @return type
+ */
+function apachesolr_location_map_callback(array $values, array $options) {
+  $map = array();
+  foreach ($values as $key) {
+    $map[$key] = substr($key, 1) . 'km';
+  }
+  return $map;
+}

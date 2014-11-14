@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the DOable Users feature.
+ */
+
+include_once 'doable_users.features.inc';

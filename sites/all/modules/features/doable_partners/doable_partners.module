@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the DOable Partners feature.
+ */
+
+include_once 'doable_partners.features.inc';

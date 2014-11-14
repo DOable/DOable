@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the DOable Press Coverage feature.
+ */
+
+include_once 'doable_press_coverage.features.inc';

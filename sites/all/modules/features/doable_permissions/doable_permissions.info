@@ -1,0 +1,15 @@
+name = DOable Permissions
+description = Feature for permissions DOable site
+core = 7.x
+package = DOable
+version = 7.x-1.0
+project = doable_permissions
+dependencies[] = features
+dependencies[] = filter_perms
+dependencies[] = node
+dependencies[] = permission_grid
+dependencies[] = permissions_lock
+features[features_api][] = api:2
+features[user_permission][] = create solution content
+features[user_permission][] = edit any solution content
+features[user_permission][] = edit own solution content

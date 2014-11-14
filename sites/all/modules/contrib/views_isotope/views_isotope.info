@@ -1,0 +1,23 @@
+; $Id:
+name = Views Isotope
+description = Create isotope views from views queries.
+package = Views
+core = 7.x
+
+dependencies[] = views
+dependencies[] = jquery_update
+dependencies[] = libraries
+
+files[] = views-isotope.tpl.php
+files[] = views_isotope.module
+files[] = views_isotope.theme.inc
+files[] = views_isotope.views.inc
+files[] = views_isotope_plugin_style_isotope.inc
+files[] = views_isotope_plugin_style_isotope_filter_block.inc
+
+; Information added by drupal.org packaging script on 2012-04-27
+version = "7.x-1.0-beta2"
+core = "7.x"
+project = "views_isotope"
+datestamp = "1335546686"
+

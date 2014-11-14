@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the DOable Articles feature.
+ */
+
+include_once 'doable_articles.features.inc';

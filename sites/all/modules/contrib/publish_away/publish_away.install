@@ -1,0 +1,102 @@
+<?php
+/**
+ * @file
+ * Schema for publish_away.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function publish_away_schema() {
+  $schema['publish_away'] = array(
+    'description' => 'Table publish_away.',
+    'fields' => array(
+      'domain_id' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'nid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'vid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'facebook_message' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+      'facebook_pic_fid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),  
+      'twitter_message' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+      'tweeter_pic_fid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'facebook_sent' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'twitt_sent' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),  
+      'facebook_enabled' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 1,
+      ),  
+      'twitter_enabled' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 1,
+      ),  
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function publish_away_install() {
+  global $base_url;
+  $t = get_t();
+  drupal_set_message($t('Publish Away Module has been installed successfully. For configuration visit <a href="@url">@url</a>.', array('@url' => $base_url . url('admin/config/services/publish-away/1'))));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function publish_away_uninstall() {
+  // Delete all variables set in variable table.
+  variable_del('publish_away_fb_appId');
+  variable_del('publish_away_fb_secret');
+  variable_del('publish_away_fb_page_id');
+  variable_del('publish_away_consumer_key');
+  variable_del('publish_away_consumer_secret');
+  variable_del('publish_away_oauth_token');
+  variable_del('publish_away_oauth_token_secret');
+  variable_del('publish_away_types');
+  variable_del('publish_away_fb_token');
+  variable_del('publish_away_fb_id');
+  variable_del('publish_away_fb_name');
+  variable_del('publish_away_fb_user_profile');
+  variable_del('publish_away_bitly_username');
+  variable_del('publish_away_bitly_apikey');
+}

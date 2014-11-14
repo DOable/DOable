@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the DOable Blog Entries feature.
+ */
+
+include_once 'doable_blog_entries.features.inc';

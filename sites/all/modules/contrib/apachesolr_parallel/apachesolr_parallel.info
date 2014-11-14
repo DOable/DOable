@@ -1,0 +1,14 @@
+name = Apache Solr Parallel
+description = Parallel indexing of the queued nodes to Solr
+package = Search Toolkit
+core = "7.x"
+
+dependencies[] = httprl
+dependencies[] = apachesolr
+
+; Information added by drupal.org packaging script on 2013-10-18
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "apachesolr_parallel"
+datestamp = "1382055524"
+

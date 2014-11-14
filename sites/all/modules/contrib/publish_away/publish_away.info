@@ -1,0 +1,14 @@
+name = Publish Away
+description = Allows you to publish your contents on social networks.
+package = Social media
+
+configure = admin/config/services/publish-away
+
+core = 7.x
+
+; Information added by Drupal.org packaging script on 2014-09-14
+version = "7.x-3.5"
+core = "7.x"
+project = "publish_away"
+datestamp = "1410703921"
+

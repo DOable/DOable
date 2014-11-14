@@ -1,0 +1,797 @@
+<?php
+/**
+ * @file
+ * The core Publish Away module.
+ */
+
+/**
+ * Implements hook_help().
+ */
+function publish_away_help($path, $arg) {
+  $output = '';
+  switch ($path) {
+    case "admin/help#publish_away":
+      $output = '<p>' . t("This module is used to post the Tweet and Facebook status with Image from your content forms.") . '</p>';
+      $output .= '<h3>' . t("Configuration") . '</h3>';
+      $output .= '<dl>';
+      $output .= '<dt>' . t("1. Get your Facebook keys on https://developers.facebook.com") . '</dt>';
+      $output .= '<dt>' . t("2. Get your Twitter keys on https://dev.twitter.com") . '</dt>';
+      $output .= '<dt>' . t("3. Get your Bilty API Keys on https://bitly.com/a/your_api_key") . '</dt>';
+      $output .= '<dt>' . t("4. Visit admin > config > services > publish-away") . '</dt>';
+      $output .= '</dl>';
+      break;
+  }
+  return $output;
+}
+
+/**
+ * Implements hook_entity_load().
+ */
+function publish_away_entity_load($entities, $type) {
+  publish_away_init();
+  global $publish_away_domain_id;
+  $get_publish_away_content = publish_away_content();
+  foreach ($entities as $entity) {
+    if ($type == 'node') {
+      if (isset($get_publish_away_content[$publish_away_domain_id][$entity->nid][$entity->vid])) {
+        $publish_away_content = $get_publish_away_content[$publish_away_domain_id][$entity->nid][$entity->vid];
+        if (isset($publish_away_content->facebook_pic_fid)) {
+          $file = file_load($publish_away_content->facebook_pic_fid);
+          if (empty($file)) {
+            $publish_away_content->facebook_pic_fid = NULL;
+          }
+        }
+        if (isset($publish_away_content->tweeter_pic_fid)) {
+          $file = file_load($publish_away_content->tweeter_pic_fid);
+          if (empty($file)) {
+            $publish_away_content->tweeter_pic_fid = NULL;
+          }
+        }
+        $entity->publish_away = (array) $publish_away_content;
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function publish_away_menu() {
+
+  $items = array();
+
+  $items['admin/config/services/publish-away'] = array(
+    'title' => 'Publish away your contents',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('publish_away_admin_form'),
+    'access arguments' => array('administer publish away'),
+    'type' => MENU_LOCAL_TASK | MENU_NORMAL_ITEM,
+    'description' => t('Send the contents to the social media.'),
+    'file' => 'publish_away.admin.inc',
+  );
+  $items['admin/config/services/publish-away/%'] = array(
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('publish_away_admin_form', 4),
+    'access arguments' => array('administer publish away'),
+    'type' => MENU_CALLBACK,
+    'file' => 'publish_away.admin.inc',
+  );
+  $items['admin/config/services/publish-away/fb-logout'] = array(
+    'page callback'    => 'publish_away_admin_fb_logout',
+    'page arguments'   => array(),
+    'access arguments' => array('administer publish away'),
+    'type' => MENU_CALLBACK,
+    'file' => 'publish_away.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function publish_away_permission() {
+  $perms = array(
+    'administer publish away' => array(
+      'title' => t('Administer publish away'),
+      'description' => '',
+      'restrict access' => TRUE,
+    ),
+  );
+
+  $types = node_type_get_types();
+  foreach ($types as $type => $info) {
+    $perms += array(
+      "publish away $type content" => array(
+        'title' => t('@type_name : Publish away', array('@type_name' => $types[$type]->name)),
+        'description' => '',
+      ),
+    );
+  }
+
+  return $perms;
+}
+
+/**
+ * Implements hook_init().
+ */
+function publish_away_init() {
+  global $publish_away_domain_id;
+  if (module_exists('domain')) {
+    $domain = domain_get_domain();
+    $publish_away_domain_id = $domain['domain_id'];
+  }
+  else {
+    $publish_away_domain_id = 1;
+  }
+  if (drupal_match_path($_GET['q'], 'admin/config/services/publish-away/*') &&
+          !drupal_match_path($_GET['q'], 'admin/config/services/publish-away/fb-logout')) {
+    $publish_away_domain_id = (int) arg(4);
+  }
+}
+
+function publish_away_set($name, $value) {
+  global $publish_away_domain_id;
+  $new_value = variable_get($name, array());
+  $new_value[$publish_away_domain_id] = $value;
+  variable_set($name, $new_value);
+}
+
+function publish_away_get($name, $default = NULL) {
+  global $publish_away_domain_id;
+  $value = variable_get($name, array());
+  return isset($value[$publish_away_domain_id]) ? $value[$publish_away_domain_id] : $default;
+}
+
+function publish_away_del($name) {
+  global $publish_away_domain_id;
+  $value = variable_get($name, array());
+  if (isset($value[$publish_away_domain_id])) {
+    unset($value[$publish_away_domain_id]);
+  }
+  variable_set($name, $value);
+}
+
+/**
+ * Send the node to Facebook.
+ * 
+ * @param object
+ *  The object node to send on Facebook.
+ * @return string
+ *  The post id created.
+ */
+function publish_away_send_on_facebook($message, $nid = 0, $vid = 0, $image_fid = 0) {
+  global $base_url, $publish_away_domain_id;
+  if (publish_away_get('publish_away_fb_appId') != NULL && publish_away_get('publish_away_fb_secret') != NULL) {
+    // Create our Application instance.
+    if (!class_exists('Facebook')) {
+      module_load_include('inc', 'publish_away', 'facebook');
+    }
+    
+    $config = array(
+      'appId'  => publish_away_get('publish_away_fb_appId', NULL),
+      'secret' => publish_away_get('publish_away_fb_secret', NULL),
+      // 'redirect_uri' => $base_url,
+      // 'cookie' => true,
+      // 'oauth' => true,  
+      // 'scope' => 'publish_stream', // publish_actions,manage_pages',
+      'scope' => 'manage_pages,publish_stream,publish_actions,offline_access,manage_pages', 
+    );
+    
+    $facebook = new Facebook($config);
+    $fb_token = $facebook->getAccessToken();
+    if (trim($fb_token) == '') {
+      $fb_token = publish_away_get('publish_away_fb_token');
+    }
+    
+    $user_id = publish_away_get('publish_away_fb_id', '0');
+    if ($user_id) {
+      
+      // $filename = NULL;
+      $fb_image = array();
+      if ($image_fid) {
+        // Image_fid - to load which image by using file_load().
+        $fb_poster_imgpath_init = file_load($image_fid);
+        // $fb_poster_imgpath = explode('://', $fb_poster_imgpath_init->uri);
+        // $filename = drupal_realpath(file_stream_wrapper_get_instance_by_uri('public://')->getDirectoryPath() . '/' . $fb_poster_imgpath[1] . '');
+      }
+      
+      // We have a user ID, so probably a logged in user.
+      // If not, we'll get an exception, which we handle below.
+      try {
+        if (isset($fb_poster_imgpath_init->uri) && trim($fb_poster_imgpath_init->uri) != '') {
+          // $imgPath = '@' . realpath($filename);
+          // $fb_image = array('picture' => $imgPath);
+          $fb_image = array('picture' => file_create_url($fb_poster_imgpath_init->uri));
+        }
+        
+        // Post to a facebook page if any.
+        $page_id_pre = publish_away_get('publish_away_fb_page_id', NULL);
+        $page_id = trim($page_id_pre);
+        $fb_account_name = t('Facebook account');
+        
+        $login = publish_away_get('publish_away_bitly_username', NULL);
+        $apiKey = publish_away_get('publish_away_bitly_apikey', NULL);
+        if ($login != NULL && $apiKey != NULL) {
+          $alias_node = $base_url . '/' . drupal_get_path_alias('node/' . $nid);
+          $request_uri = request_uri();
+          if ($request_uri != '') {
+            $uri = explode('/', request_uri());
+          }
+          $alias_node = isset($uri[1]) ? str_replace($uri[1] . '/' . $uri[1], $uri[1], $alias_node) : $alias_node;
+          $node_url = publish_away_generate_short_url($alias_node);
+        }
+        else {
+           $node_url = $base_url . '/' . drupal_get_path_alias('node/' . $nid);
+        }
+
+        if (!empty($page_id)) {
+          $fb_accounts = $facebook->api('me/accounts');
+          if (isset($fb_accounts['data']) && !empty($fb_accounts['data'])) {
+            foreach ($fb_accounts['data'] as $key => $value) {
+              if (isset($value['id']) && $value['id'] == $page_id && isset($value['access_token'])) {
+                $fb_token_page = $value['access_token'];
+                $fb_account_name = t('Facebook page') . ' ' . '"'.$value['name'].'"';
+              }
+            }
+          }
+          /*$page_info = $facebook->api("/$page_id?fields=access_token");*/
+          $args = array(
+            'access_token'  => isset($fb_token_page) ? $fb_token_page : $fb_token,
+            'message'       => $message ,
+            'link'         => $node_url,
+          )+ $fb_image;
+          $post_id = $facebook->api("/$page_id/feed", "post", $args);
+        }
+        // Post to the main timeline account.
+        else {
+          $fb_account_name = t('Facebook account');
+          $post_id = $facebook->api("me/feed", "POST", array(
+              'access_token' => $fb_token,
+              'message' => $message,
+              'link' => $node_url,
+          ) + $fb_image);
+        }
+        
+        if (!empty($post_id)) {
+          $params = array('facebook_sent' => 1);
+          drupal_set_message(t('Your post has been send successfully on your @account.', array('@account' => $fb_account_name)));
+          publish_away_update_content($nid, $vid, $params, $publish_away_domain_id);
+        }
+        
+        return $post_id;
+      }
+      catch (FacebookApiException $e) {
+        // If the user is logged out, you can have a 
+        // user ID even though the access token is invalid.
+        drupal_set_message(t('Refresh your session by visiting "admin/config/services/publish-away" 
+          and disconnect the Facebook app and reconnect it.'), 'error');
+        drupal_set_message($e->getType(), 'error');
+        drupal_set_message($e->getMessage(), 'error');
+      }
+    }
+  }
+}
+
+/**
+ * Send the node to Twitter.
+ * 
+ * @param object
+ *  The object node to send on Twitter.
+ * @return string
+ *  The post id created.
+ */
+function publish_away_send_on_twitter($message = '', $nid = 0, $vid = 0, $image_fid = 0) {
+  global $base_url, $publish_away_domain_id;
+  $consumer_key = publish_away_get('publish_away_consumer_key', NULL);
+  $consumer_secret = publish_away_get('publish_away_consumer_secret', NULL);
+  $oauth_token = publish_away_get('publish_away_oauth_token', NULL);
+  $oauth_token_secret = publish_away_get('publish_away_oauth_token_secret', NULL);
+  
+  if ($consumer_key != NULL && $consumer_secret != NULL && $oauth_token != NULL && $oauth_token_secret != NULL) {
+    if (!class_exists('tmhOAuth')) {
+      require_once drupal_get_path('module', 'publish_away') . '/tmhOAuth/tmhOAuth.php';
+    }
+    if (!class_exists('tmhUtilities')) {
+      require_once drupal_get_path('module', 'publish_away') . '/tmhOAuth/tmhUtilities.php';
+    }
+    
+    $tmhOAuth = new tmhOAuth(array(
+      'consumer_key' => $consumer_key,
+      'consumer_secret' => $consumer_secret,
+      'user_token' => $oauth_token,
+      'user_secret' => $oauth_token_secret,
+    ));
+    $response_code = $tmhOAuth->request('GET', $tmhOAuth->url('1.1/account/verify_credentials'));
+    
+    if ($response_code == 200) {
+      // Append the node URL to the status message.
+      $login = publish_away_get('publish_away_bitly_username', NULL);
+      $apiKey = publish_away_get('publish_away_bitly_apikey', NULL);
+
+      if ($login != NULL && $apiKey != NULL) {
+        $alias_node = $base_url . '/' . drupal_get_path_alias('node/' . $nid);
+        $request_uri = request_uri();
+        if ($request_uri != '') {
+          $uri = explode('/', request_uri());
+        }
+        $alias_node = isset($uri[1]) ? str_replace($uri[1] . '/' . $uri[1], $uri[1], $alias_node) : $alias_node;
+        $node_url = publish_away_generate_short_url($alias_node);
+      }
+      else {
+         $node_url = $base_url . '/' . drupal_get_path_alias('node/' . $nid);
+      }
+      $message .= ' ' . $node_url;
+
+      $filename = NULL;
+      $filemime = 'image/png';
+      if ((int) $image_fid) {
+        // Image_fid - to load which image by using file_load().
+        $tweet_poster_imgpath = file_load($image_fid);
+        $tweet_poster_imgpath = explode('://', $tweet_poster_imgpath->uri);
+        $filename = drupal_realpath(file_stream_wrapper_get_instance_by_uri('public://')->getDirectoryPath() . '/' . $tweet_poster_imgpath[1] . '');
+        // $handle = fopen($filename, "rb");
+        // $image = fread($handle, filesize($filename));
+        $ext = explode('.', $tweet_poster_imgpath[1]);
+        $filemime = 'image/' . $ext[1];
+        
+        $url = $tmhOAuth->url('1.1/statuses/update_with_media');
+        $params = array(
+          'media' => "@{$filename};type={$filemime};filename={$filename}",
+          'status' => $message,
+        );
+      }
+      else {
+        $url = $tmhOAuth->url('1.1/statuses/update');
+        $params = array(
+          'status' => $message,
+        );
+      }
+
+      $code = $tmhOAuth->request(
+        'POST',
+        $url,
+        $params,
+        true, // use auth.
+        true  // multipart.
+      );
+      
+      if ($code == 200) {
+        drupal_set_message(t('Your twitter has been posted successfully.'));
+        $publish_away_params = array('tweeter_pic_fid' => $image_fid, 'twitt_sent' => 1);
+        publish_away_update_content($nid, $vid, $publish_away_params, $publish_away_domain_id);
+      }
+      else {
+        drupal_set_message(t('There was an error @errorcode from Twitter. Visit <a href="@httpcode" target="_blank">Twitter HTTP Status Codes page</a> to understand what is going wrong.', array('@errorcode' => $code, '@httpcode' => 'https://dev.twitter.com/docs/error-codes-responses')), 'error');
+      }
+    }
+    else {
+      drupal_set_message(t('There was an error @errorcode from Twitter. Visit <a href="@httpcode" target="_blank">Twitter HTTP Status Codes page</a> to understand what is going wrong.', array('@errorcode' => $response_code, '@httpcode' => 'https://dev.twitter.com/docs/error-codes-responses')), 'error');
+    }
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function publish_away_theme() {
+  return array(
+    'publish_away_thumb_upload' => array(
+      'render element' => 'element',
+    )
+  );
+}
+
+/**
+ * Implements publish_away_thumb_upload theme callback.
+ */
+function theme_publish_away_thumb_upload($variables) {
+  $image_image_default_styles = image_image_default_styles();
+  $output = '';
+  if (!empty($image_image_default_styles)) {
+    if (isset($image_image_default_styles['thumbnail'])) {
+      $thumbnail = 'thumbnail';
+    }
+    else {
+      foreach ($image_image_default_styles as $style_key => $style_value) {
+        if ($style_value['effects']['data']['width'] <= 100) {
+          $thumbnail = $style_key;
+        }
+      }
+    }
+    
+    if (empty($thumbnail)) {
+      $output = '<span style="color:red;">' . t('Your image has been successfully downloaded, but no thumbnail found, please create a stylish image with a width of 100.') . '</span>';
+    }
+  }
+  $element = $variables['element'];
+  if (isset($element['#file']->uri)) {
+    $output .= '<div id="edit-logo-ajax-wrapper"><div class="form-item form-type-managed-file form-item-logo"><span class="file">';
+    $output .= isset($thumbnail) ? '<img src="' . image_style_url($thumbnail, $element['#file']->uri) . '" />' : '';
+    $output .= '</span><input style="float:right;" type="submit" id="edit-' . $element['#name'] . '-remove-button" name="' . $element['#name'] . '_remove_button" value="Remove" class="form-submit ajax-processed">';
+    $output .= '<input type="hidden" name="' . $element['#name'] . '[fid]" value="' . $element['#file']->fid . '"></div></div>';
+    return $output;
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function publish_away_form_alter(&$form, &$form_state, $form_id) {
+  global $base_url, $publish_away_domain_id;
+  $publish_away_types = publish_away_get('publish_away_types', array());
+
+  if (isset($form['nid']['#value']) && (int) $form['nid']['#value'] && isset($form['vid']['#value'])) {
+    $get_publish_away_content = publish_away_content($form['nid']['#value'], $form['vid']['#value']);
+    if (isset($get_publish_away_content[$publish_away_domain_id][$form['nid']['#value']][$form['vid']['#value']])) {
+      $publish_away_content = $get_publish_away_content[$publish_away_domain_id][$form['nid']['#value']][$form['vid']['#value']];
+    }
+  }
+  if (isset($_SESSION['publish_away_records'])) {
+    unset($_SESSION['publish_away_records']);
+  }
+  $display_tokens = FALSE;
+  
+  foreach (node_type_get_types() as $type => $info) {
+    if ($form_id == $type . '_node_form' && isset($publish_away_types[$type]) && $publish_away_types[$type] && user_access("publish away $type content")) {
+      $form['publish-away']['#tree'] = TRUE;
+      // Generate a short url.
+      $node_url = $node_link = '';
+
+      $login = publish_away_get('publish_away_bitly_username', NULL);
+      $apiKey = publish_away_get('publish_away_bitly_apikey', NULL);
+
+      if (isset($form['nid']['#value']) && (int) $form['nid']['#value'] && $login != NULL && $apiKey != NULL) {
+        $alias_node = $base_url . '/' . drupal_get_path_alias('node/' . $form['nid']['#value']);
+        $request_uri = request_uri();
+        if ($request_uri != '') {
+          $uri = explode('/', request_uri());
+        }
+        $alias_node = isset($uri[1]) ? str_replace($uri[1] . '/' . $uri[1], $uri[1], $alias_node) : $alias_node;
+        $node_url = publish_away_generate_short_url($alias_node);
+      }
+      elseif (isset($form['nid']['#value']) && (int) $form['nid']['#value'] && trim($node_url) == '') {
+        $node_url = $base_url . '/' . drupal_get_path_alias('node/' . $form['nid']['#value']);
+      }
+      if (isset($form['nid']['#value']) && (int) $form['nid']['#value']) {
+        $node_link = t('The simplified url of this content is <span style="color:#0074BD;">@node_url</span>', array('@node_url' => $node_url));
+      }
+      $form['publish-away'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Publish away settings'),
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE,
+        '#group' => 'additional_settings',
+        '#weight' => -999,
+        '#description' => t('Send to the social media.') . $node_link,
+      );
+
+      // Facebook settings.
+      $fb_appId = publish_away_get('publish_away_fb_appId', NULL);
+      $fb_secret = publish_away_get('publish_away_fb_secret', NULL);
+      $fb_token = publish_away_get('publish_away_fb_token', NULL);
+
+      if ($fb_token != NULL && $fb_appId != NULL && $fb_secret != NULL) {
+        $default_message = module_exists('token') ? '[node:title]' : '';
+        $form['publish-away']['facebook_enabled'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Enable Facebook publish away on this content.'),
+          '#default_value' => (int) FALSE,
+          // '#default_value' => isset($publish_away_content->facebook_enabled) ? (int) (bool) $publish_away_content->facebook_enabled : (int) FALSE,
+        );
+        $form['publish-away']['publish_away_facebook_message'] = array(
+          '#type' => 'textarea',
+          '#title' => t('Message for Facebook'),
+          '#rows' => 2,
+          '#maxlength' => 140,
+          '#default_value' => isset($publish_away_content->facebook_message) ? $publish_away_content->facebook_message : $default_message,
+          '#description' => t('The message to be displayed on Facebook. The maximum is 140 characters. Here you can enter a token which will be used as message.'),
+          '#states' => array(
+            'visible' => array(
+              ':input[name="facebook_enabled"]' => array('checked' => TRUE),
+            ),
+          ),
+        );
+        $form['publish-away']['publish_away_facebook_pic_fid'] = array(
+          '#title' => t('Image for Facebook'),
+          '#type' => 'managed_file',
+          '#theme' => 'publish_away_thumb_upload',
+          '#default_value' => isset($publish_away_content->facebook_pic_fid) ? $publish_away_content->facebook_pic_fid : 0,
+          '#upload_validators' => array("file_validate_extensions" => array("png gif jpg jpeg bmp")),
+          '#upload_location' => 'public://',
+          '#description' => t('Allowed extensions: png gif jpg jpeg bmp'),  
+          '#states' => array(
+            'visible' => array(
+              ':input[name="facebook_enabled"]' => array('checked' => TRUE),
+            ),
+          ),
+        );
+        $display_tokens = TRUE;
+      }
+      else {
+        $form['publish-away']['no-facebook'] = array(
+          '#markup' => t('Facebook is not configured.'),
+        );
+        if (user_access('administer publish away')) {
+          $form['publish-away']['no-facebook']['#markup'] .= t('Visit <a href="@publish_away">@publish_away</a>', array('@publish_away' => $base_url . url('admin/config/services/publish-away'))) . '<br />';
+        }
+      }
+      // Twitter settings.
+      $consumer_key = publish_away_get('publish_away_consumer_key', NULL);
+      $consumer_secret = publish_away_get('publish_away_consumer_secret', NULL);
+      $oauth_token = publish_away_get('publish_away_oauth_token', NULL);
+      $oauth_token_secret = publish_away_get('publish_away_oauth_token_secret', NULL);
+
+      if (!empty($consumer_key) && !empty($consumer_secret ) && !empty($oauth_token) && !empty($oauth_token_secret)) {
+        $form['publish-away']['twitter_enabled'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Enable Twitter publish away on this content.'),
+          '#default_value' => (int) FALSE,
+          // '#default_value' => isset($publish_away_content->twitter_enabled) ? (int) (bool) $publish_away_content->twitter_enabled : (int) FALSE,
+        );
+        $form['publish-away']['publish_away_twitter_message'] = array(
+          '#type' => 'textarea',
+          '#title' => t('Message for Twitter'),
+          '#rows' => 2,
+          '#maxlength' => 115,
+          '#default_value' => isset($publish_away_content->twitter_message) ? $publish_away_content->twitter_message : $default_message,
+          '#description' => t('The message to be displayed on Twitter. The maximum is 115 characters, to allow space for a link. Here you can enter a token which will be used as message.'),
+          '#states' => array(
+            'visible' => array(
+              ':input[name="twitter_enabled"]' => array('checked' => TRUE),
+            ),
+          ),
+        );
+        $form['publish-away']['publish_away_tweeter_pic_fid'] = array(
+          '#title' => t('Image for Twitter'),
+          '#type' => 'managed_file',
+          '#theme' => 'publish_away_thumb_upload',  
+          '#default_value' => isset($publish_away_content->tweeter_pic_fid) ? $publish_away_content->tweeter_pic_fid : 0,
+          '#upload_validators' => array("file_validate_extensions" => array("png gif jpg jpeg bmp")),
+          '#upload_location' => 'public://',
+          '#description' => t('Allowed extensions: png gif jpg jpeg bmp'), 
+          '#states' => array(
+            'visible' => array(
+              ':input[name="twitter_enabled"]' => array('checked' => TRUE),
+            ),
+          ),
+        );
+        $display_tokens = TRUE;
+      }
+      else {
+        $form['publish-away']['no-twitter'] = array(
+          '#markup' => t('Twitter is not configured.'),
+        );
+        if (user_access('administer publish away')) {
+          $form['publish-away']['no-twitter']['#markup'] .= t('Visit <a href="@publish_away">@publish_away</a>', array('@publish_away' => $base_url . url('admin/config/services/publish-away'))) . '<br />';
+        }
+      }
+      if (module_exists('token') && $display_tokens) {
+        $form['publish-away']['token'] = array(
+          '#type' => 'container',
+          '#theme' => 'token_tree',
+          '#token_types' => array('node'),
+          '#dialog' => TRUE,
+        );
+      }
+
+      $form['#validate'][] = 'publish_away_custom_form_validate';
+      $form['#submit'][] = 'publish_away_custom_form_submit';
+    }
+  }
+}
+
+function publish_away_custom_form_validate($form, &$form_state) {
+  if (isset($form_state['values']['facebook_enabled']) && (int) $form_state['values']['facebook_enabled'] && trim($form_state['values']['publish_away_facebook_message']) == ''
+     && (int) $form_state['values']['publish_away_facebook_pic_fid'] == 0) {
+    form_set_error('publish_away_facebook_message', t('Message Facebook is empty.'));
+  }
+  if (isset($form_state['values']['twitter_enabled']) && (int) $form_state['values']['twitter_enabled'] && trim($form_state['values']['publish_away_twitter_message']) == ''
+     && (int) $form_state['values']['publish_away_tweeter_pic_fid'] == 0) {
+    form_set_error('publish_away_twitter_message', t('Message Twitter is empty.'));
+  }
+}
+
+/**
+ * Save publish away data.
+ */
+function publish_away_custom_form_submit($form, &$form_state) {
+  global $publish_away_domain_id;
+  $record = array();
+  if (isset($form_state['values']['op']) && $form_state['values']['op'] != t('Preview')) {
+    form_state_values_clean($form_state);
+    
+    if (isset($form_state['values']['nid']) && (int) $form_state['values']['nid']) {
+      db_delete('publish_away')
+        ->condition('domain_id', $publish_away_domain_id)
+        ->condition('nid', $form_state['values']['nid'])
+        ->condition('vid', $form_state['values']['vid'])
+        ->execute();
+
+      $record = array(
+        'domain_id' => $publish_away_domain_id,
+        'nid' => $form_state['values']['nid'],
+        'vid' => $form_state['values']['vid'],
+      );
+    }
+    if (isset($form_state['values']['facebook_enabled'])) {
+      $record += array(
+        'facebook_enabled' => (int) $form_state['values']['facebook_enabled'],
+      );
+    }
+    if (isset($form_state['values']['twitter_enabled'])) {
+      $record += array(
+        'twitter_enabled' => (int) $form_state['values']['twitter_enabled'],
+      );
+    }
+    
+    $fb_image_fid = 0;
+    if (isset($form_state['values']['publish_away_facebook_pic_fid'])) {
+      $record += array('facebook_pic_fid' => $form_state['values']['publish_away_facebook_pic_fid']);
+      $fb_image_fid = (int) $form_state['values']['publish_away_facebook_pic_fid'];
+    }
+    if (!empty($form_state['values']['publish_away_facebook_message'])) {
+      $record += array(
+        'facebook_message' => $form_state['values']['publish_away_facebook_message']
+      );
+    }
+    else {
+      $record['facebook_message'] = '';
+    }
+    $image_fid = 0;
+    if (isset($form_state['values']['publish_away_tweeter_pic_fid'])) {
+      $record += array('tweeter_pic_fid' => $form_state['values']['publish_away_tweeter_pic_fid']);
+      $image_fid = (int) $form_state['values']['publish_away_tweeter_pic_fid'];
+    }
+    if (!empty($form_state['values']['publish_away_twitter_message'])) {
+      $record += array(
+        'twitter_message' => $form_state['values']['publish_away_twitter_message']
+      );
+    }
+    else {
+      $record['twitter_message'] = '';
+    }
+    if (isset($form_state['values']['nid']) && (int) $form_state['values']['nid'] && !empty($record)) {
+      $record += array('tweeter_pic_fid' => $image_fid);
+      drupal_write_record('publish_away', $record);
+      $_SESSION['publish_away_records'] = $record;
+    }
+    else {
+      $_SESSION['publish_away_records'] = $record;
+    }
+  }
+}
+
+function publish_away_update_content($nid, $vid, $params, $domain_id = 1) {
+  if (!empty($params)) {
+    db_update('publish_away')
+      ->fields($params)
+      ->condition('nid', $nid)
+      ->condition('vid', $vid)
+      ->condition('domain_id', $domain_id)
+      ->execute();
+  }
+}
+
+function publish_away_content($nid = NULL, $vid = NULL) {
+  $cache = &drupal_static(__FUNCTION__, array());
+  if (empty($nid) && empty($vid) && !empty($cache)) {
+    return $cache;
+  }
+  // Try to allocate enough memory.
+  ini_set('memory_limit', -1);
+  // Try to allocate enough time.
+  drupal_set_time_limit(0);
+  $query = db_select('publish_away', 'p')
+    ->fields('p')
+    ->orderBy('p.nid');
+  if (!empty($nid)) {
+    $query->condition('nid', $nid);
+  }
+  if (!empty($vid)) {
+    $query->condition('vid', $vid);
+  }
+  $result = $query->execute();
+  while ($record = $result->fetchObject()) {
+    $cache[$record->domain_id][$record->nid][$record->vid] = $record;
+  }
+  return $cache;
+}
+
+/**
+ * Implements hook_node_delete().
+ */
+function publish_away_node_delete($node) {
+  db_delete('publish_away')->condition('nid', $node->nid)->execute();
+}
+
+/**
+ * Implements hook_node_insert().
+ */
+function publish_away_node_insert($node) {
+  global $publish_away_domain_id;
+  if (isset($_SESSION['publish_away_records']) && is_array($_SESSION['publish_away_records']) && !empty($_SESSION['publish_away_records'])) {
+    $record = array(
+      'domain_id' => $publish_away_domain_id,
+      'nid' => $node->nid,
+      'vid' => $node->vid,
+    );
+    $record += $_SESSION['publish_away_records'];
+    drupal_write_record('publish_away', $record);
+  }
+  publish_away_node_update($node);
+}
+
+/**
+ * Implements hook_node_update().
+ */
+function publish_away_node_update($node) {
+  global $publish_away_domain_id;
+  
+  if (isset($_SESSION['publish_away_records']) && is_array($_SESSION['publish_away_records']) && !empty($_SESSION['publish_away_records'])) {
+    db_delete('publish_away')
+          ->condition('domain_id', $publish_away_domain_id)
+          ->condition('nid', $node->nid)
+          ->condition('vid', $node->vid)
+          ->execute();
+
+    $record = array(
+      'domain_id' => $publish_away_domain_id,
+      'nid' => $node->nid,
+      'vid' => $node->vid,
+    );
+    $_SESSION['publish_away_records'] += $record;
+    drupal_write_record('publish_away', $_SESSION['publish_away_records']);
+    
+    $publish_away_content = (object) $_SESSION['publish_away_records'];
+    $facebook_image_fid = 0;
+    if (isset($publish_away_content->facebook_pic_fid) && (int) $publish_away_content->facebook_pic_fid) {
+      $facebook_image_fid = $publish_away_content->facebook_pic_fid;
+    }
+    if ($node->status == NODE_PUBLISHED && isset($publish_away_content->facebook_enabled) && (int) $publish_away_content->facebook_enabled
+       && ($facebook_image_fid > 0 || isset($publish_away_content->facebook_message))) {
+      $publish_away_content->facebook_message = token_replace($publish_away_content->facebook_message, array('node' => $node));
+      publish_away_send_on_facebook(strip_tags($publish_away_content->facebook_message), $node->nid, $node->vid, $facebook_image_fid);
+    }
+    $twitter_image_fid = 0;
+    if (isset($publish_away_content->tweeter_pic_fid) && (int) $publish_away_content->tweeter_pic_fid) {
+      $twitter_image_fid = $publish_away_content->tweeter_pic_fid;
+    }
+    if ($node->status == NODE_PUBLISHED && isset($publish_away_content->twitter_enabled) && (int) $publish_away_content->twitter_enabled
+       && ($twitter_image_fid > 0 || isset($publish_away_content->twitter_message))) {
+      $publish_away_content->twitter_message = token_replace($publish_away_content->twitter_message, array('node' => $node));
+      publish_away_send_on_twitter(strip_tags($publish_away_content->twitter_message), $node->nid, $node->vid, $twitter_image_fid);
+    }
+    unset($_SESSION['publish_away_records']);
+  }
+}
+
+function publish_away_generate_short_url($longUrl) {
+  $cache = &drupal_static(__FUNCTION__, array());
+  if (isset($cache[$longUrl]) && !empty($cache[$longUrl])) {
+    return $cache;
+  }
+  $login = publish_away_get('publish_away_bitly_username', NULL);
+  $apiKey = publish_away_get('publish_away_bitly_apikey', NULL);
+  if (!empty($login) && !empty($apiKey)) {
+    $apiUrl = 'http://api.bit.ly';
+    $version = 'v3';
+    $action = 'shorten';
+    $format = 'txt';
+    $callback = '';
+
+    $parameters = "login=$login&apiKey=$apiKey&longUrl=$longUrl&format=$format&callback=$callback";
+    // With CURL extension.
+    $ch = curl_init("$apiUrl/$version/$action?$parameters");  
+    curl_setopt($ch, CURLOPT_NOBODY, False);  
+    curl_setopt($ch, CURLOPT_HEADER, False);  
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, True);  
+    $shortUrl = curl_exec($ch);
+    $cache[$longUrl] = $shortUrl;
+    return $cache[$longUrl];
+  }
+  else {
+    return '';
+  }
+}
+

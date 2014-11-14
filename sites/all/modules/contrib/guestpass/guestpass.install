@@ -1,0 +1,85 @@
+<?php
+/**
+ * @file
+ * Define fields for a Guest User.
+ * Installation file
+ */
+define('GUEST_ROLE', 'guest');
+/**
+ * Implements hook_field_schema().
+ */
+function guestpass_schema() {
+  $schema['guestpass_relationships'] = array(
+  'description' => t('A table containing a list of guestpass urls and the host users that created them.'),
+    'fields' => array(
+      'guest_link' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => t('The URL that the host sends to the guest to create and auto-login the guest.')
+      ),
+      'redirect_url' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => t('The Drupal page that the guest link redirects to after the guest user is logged in.')
+      ),
+      'host_uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => t('The UID of the Hosting User.')
+      ),
+    ),
+    'primary key' => array('guest_link'),
+  );
+  $schema['guestpass_guests'] = array(
+    'description' => t('A table containing a list of guestpass users and the url associated with them.'),
+    'fields' => array(
+      'guest_link' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => t('The URL that the host sends to the guest to create and auto-login the guest.')
+      ),
+      'guest_uid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => t('The UID of the Guest User')
+      ),
+      'created' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp for when user was created.',
+      ),
+    ),
+    'primary key' => array('guest_uid'),
+  );
+  return $schema;
+}
+/**
+ * Implements hook_install().
+ */
+function guestpass_install() {
+  $guest_role = new stdClass();
+  $guest_role->name = GUEST_ROLE;
+  user_role_save($guest_role);
+}
+/**
+ * Implements hook_uninstall().
+ */
+function guestpass_uninstall() {
+  $guest_users = db_query('SELECT * FROM {guestpass_guests}')->fetchAll();
+  foreach ($guest_users as $guest_user) {
+    user_delete($guest_user->guest_uid);
+  }
+
+  drupal_uninstall_schema('guestpass');
+  user_role_delete(GUEST_ROLE);
+}

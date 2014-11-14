@@ -1,0 +1,15 @@
+name = DOable Search
+description = Feature for search on DOable site
+core = 7.x
+package = DOable
+version = 7.x-1.0
+project = doable_search
+dependencies[] = apachesolr
+dependencies[] = apachesolr_access
+dependencies[] = apachesolr_attachments
+dependencies[] = apachesolr_autocomplete
+dependencies[] = apachesolr_search
+dependencies[] = apachesolr_sort
+dependencies[] = apachesolr_term
+dependencies[] = apachesolr_views
+features[features_api][] = api:2

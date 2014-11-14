@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the DOable Solutions feature.
+ */
+
+include_once 'doable_solutions.features.inc';

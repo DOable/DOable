@@ -1,0 +1,3 @@
+<?php
+include_once('guestpass.inc');
+include_once('guestpass.admin.inc');
