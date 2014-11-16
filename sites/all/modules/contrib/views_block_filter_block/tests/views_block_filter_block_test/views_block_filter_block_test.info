@@ -1,0 +1,13 @@
+name = Views Block Exposed Filter Block Test
+description = Test module for Views Block Exposed filter Block.
+package = Views
+core = 7.x
+dependencies[] = views_block_filter_block
+hidden = TRUE
+
+; Information added by Drupal.org packaging script on 2013-12-24
+version = "7.x-1.0-beta1"
+core = "7.x"
+project = "views_block_filter_block"
+datestamp = "1387925909"
+

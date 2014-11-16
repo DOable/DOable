@@ -1,0 +1,15 @@
+name = Views Block Exposed Filter Block
+description = "Provides blocks for Views exposed filters on View blocks."
+core = 7.x
+package = Views
+dependencies[] = views
+
+files[] = plugins/vbfb_plugin_display_block.inc
+files[] = tests/views_block_filter_block.test
+
+; Information added by Drupal.org packaging script on 2013-12-24
+version = "7.x-1.0-beta1"
+core = "7.x"
+project = "views_block_filter_block"
+datestamp = "1387925909"
+
