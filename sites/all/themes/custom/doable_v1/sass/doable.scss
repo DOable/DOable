@@ -494,7 +494,43 @@ body.node-type-article .field-name-field-article-image,
 
 
 
+/* SOLUTIONS - Filter */
 
+.pane-views-solutions-filter-block {
+  border-top: solid 1px silver;
+  border-bottom: solid 1px silver;
+}
+
+
+.pane-views-solutions-filter-block h2.pane-title {
+  font-size: 18px !important;
+  margin-top: .2em !important;
+  margin-bottom: .2em !important;
+}
+
+.view-solutions-filter .views-row {
+  display: inline-block;
+  width: 130px;
+  vertical-align: top;
+}
+
+.view-solutions-filter .views-row img {
+  border: solid 1px silver;
+}
+
+.view-solutions-filter .views-row .views-field-title span {
+  word-wrap: break-word;
+}
+
+.view-solutions-filter .view-content {
+  height: 160px;
+  overflow: scroll; 
+}
+
+
+.page-solutions .panels-flexible-column-last {
+ 
+}
 
 
 /* SIDEBARS */

@@ -1701,7 +1701,7 @@ tr.selected td {
 /* line 803, ../sass/components/_misc.scss */
 .progress .filled {
   background-color: #0072b9;
-  background-image: url('../images/progress.gif?1398877488');
+  background-image: url('../images/progress.gif?1415852039');
 }
 
 /**
@@ -2250,8 +2250,45 @@ body.node-type-article .field-name-field-article-image,
   margin-top: 10px;
 }
 
+/* SOLUTIONS - Filter */
+/* line 499, ../sass/doable.scss */
+.pane-views-solutions-filter-block {
+  border-top: solid 1px silver;
+  border-bottom: solid 1px silver;
+}
+
+/* line 505, ../sass/doable.scss */
+.pane-views-solutions-filter-block h2.pane-title {
+  font-size: 18px !important;
+  margin-top: .2em !important;
+  margin-bottom: .2em !important;
+}
+
+/* line 511, ../sass/doable.scss */
+.view-solutions-filter .views-row {
+  display: inline-block;
+  width: 130px;
+  vertical-align: top;
+}
+
+/* line 517, ../sass/doable.scss */
+.view-solutions-filter .views-row img {
+  border: solid 1px silver;
+}
+
+/* line 521, ../sass/doable.scss */
+.view-solutions-filter .views-row .views-field-title span {
+  word-wrap: break-word;
+}
+
+/* line 525, ../sass/doable.scss */
+.view-solutions-filter .view-content {
+  height: 160px;
+  overflow: scroll;
+}
+
 /* SIDEBARS */
-/* line 502, ../sass/doable.scss */
+/* line 539, ../sass/doable.scss */
 #main .sidebar h2.pane-title {
   font-family: "MuseoSans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333333;
@@ -2266,13 +2303,13 @@ body.node-type-article .field-name-field-article-image,
 }
 
 /* SIDEBARS - Add Solution */
-/* line 517, ../sass/doable.scss */
+/* line 554, ../sass/doable.scss */
 .pane-block-1 p {
   width: 100%;
   display: block;
 }
 
-/* line 522, ../sass/doable.scss */
+/* line 559, ../sass/doable.scss */
 .pane-block-1 a.button-link {
   width: 100%;
   background-color: #3D8901;
@@ -2284,7 +2321,7 @@ body.node-type-article .field-name-field-article-image,
 }
 
 /* SIDEBAR - Trending Solutions */
-/* line 537, ../sass/doable.scss */
+/* line 574, ../sass/doable.scss */
 .view-solutions-trending-sidebar .views-row {
   width: 100%;
   max-height: 100px;
@@ -2293,7 +2330,7 @@ body.node-type-article .field-name-field-article-image,
   padding-right: 10px;
 }
 
-/* line 545, ../sass/doable.scss */
+/* line 582, ../sass/doable.scss */
 .view-solutions-trending-sidebar .views-field-field-solution-image {
   float: left;
   margin-right: 10px;
@@ -2301,18 +2338,18 @@ body.node-type-article .field-name-field-article-image,
   display: block;
 }
 
-/* line 552, ../sass/doable.scss */
+/* line 589, ../sass/doable.scss */
 .view-solutions-trending-sidebar .views-field-title {
   margin-top: 10px;
   display: inline-block;
 }
 
-/* line 561, ../sass/doable.scss */
+/* line 598, ../sass/doable.scss */
 .view-solutions-trending-sidebar .views-field-field-solution-teaser p {
   font-size: 10px;
 }
 
-/* line 565, ../sass/doable.scss */
+/* line 602, ../sass/doable.scss */
 .view-solutions-trending-sidebar .views-field-comment-count {
   display: inline-block;
   width: 16px;
@@ -2324,7 +2361,7 @@ body.node-type-article .field-name-field-article-image,
   top: -12px;
 }
 
-/* line 577, ../sass/doable.scss */
+/* line 614, ../sass/doable.scss */
 .view-solutions-trending-sidebar .views-field-comment-count span,
 .view-solutions-trending-sidebar .views-field-comment-count span a {
   font-family: "ProximaNova";
@@ -2333,7 +2370,7 @@ body.node-type-article .field-name-field-article-image,
   line-height: 18px;
 }
 
-/* line 586, ../sass/doable.scss */
+/* line 623, ../sass/doable.scss */
 .view-solutions-trending-sidebar .views-field-field-solution-tags {
   height: 18px;
   width: 0px;
@@ -2344,13 +2381,13 @@ body.node-type-article .field-name-field-article-image,
   overflow: hidden;
 }
 
-/* line 596, ../sass/doable.scss */
+/* line 633, ../sass/doable.scss */
 .view-solutions-trending-sidebar .views-field-field-solution-tags a {
   font-size: 13px;
   line-height: 18px;
 }
 
-/* line 602, ../sass/doable.scss */
+/* line 639, ../sass/doable.scss */
 .view-solutions-trending-sidebar .views-field-field-solution-sectors {
   display: inline-block;
   width: 20px;
@@ -2359,45 +2396,45 @@ body.node-type-article .field-name-field-article-image,
 }
 
 /* SIDEBAR - Browse Solutions */
-/* line 614, ../sass/doable.scss */
+/* line 651, ../sass/doable.scss */
 .ui-state-active a, .ui-state-active a:link, .ui-state-active a:visited,
 .view-solutions-browse-by-tag a {
   color: #333333;
 }
 
-/* line 619, ../sass/doable.scss */
+/* line 656, ../sass/doable.scss */
 .view-solutions-browse-by-tag li a:hover {
   color: #3D8901;
 }
 
-/* line 623, ../sass/doable.scss */
+/* line 660, ../sass/doable.scss */
 .view-solutions-browse-by-tag .views-row {
   margin-bottom: .25em;
 }
 
-/* line 631, ../sass/doable.scss */
+/* line 668, ../sass/doable.scss */
 .view-solutions-browse-by-tag .view-footer {
   margin-top: 10px;
 }
 
-/* line 635, ../sass/doable.scss */
+/* line 672, ../sass/doable.scss */
 .ui-accordion .ui-accordion-header a {
   padding-left: 1.5em;
 }
 
-/* line 640, ../sass/doable.scss */
+/* line 677, ../sass/doable.scss */
 .ui-accordion .ui-accordion-header .ui-icon {
   left: 0em;
 }
 
-/* line 644, ../sass/doable.scss */
+/* line 681, ../sass/doable.scss */
 .ui-accordion .ui-accordion-header a {
   padding-left: 1.25em;
   padding-top: .35em;
   padding-bottom: .25em;
 }
 
-/* line 650, ../sass/doable.scss */
+/* line 687, ../sass/doable.scss */
 .ui-state-default,
 .ui-state-active,
 .ui-widget-content .ui-state-default,
@@ -2407,7 +2444,7 @@ body.node-type-article .field-name-field-article-image,
   border: none;
 }
 
-/* line 672, ../sass/doable.scss */
+/* line 709, ../sass/doable.scss */
 .ui-state-active,
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active {
@@ -2419,7 +2456,7 @@ body.node-type-article .field-name-field-article-image,
   border-right-width-value: 0px;
 }
 
-/* line 683, ../sass/doable.scss */
+/* line 720, ../sass/doable.scss */
 .view-solutions-browse-by-tag .ui-corner-all {
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
@@ -2427,12 +2464,12 @@ body.node-type-article .field-name-field-article-image,
   border-top-right-radius: 0px;
 }
 
-/* line 690, ../sass/doable.scss */
+/* line 727, ../sass/doable.scss */
 h3.ui-state-active a {
   color: #3D8901 !important;
 }
 
-/* line 694, ../sass/doable.scss */
+/* line 731, ../sass/doable.scss */
 .view-solutions-browse-by-tag .ui-accordion-content {
   padding-top: 5px;
   padding-bottom: 0px;
@@ -2441,21 +2478,21 @@ h3.ui-state-active a {
   border: none;
 }
 
-/* line 702, ../sass/doable.scss */
+/* line 739, ../sass/doable.scss */
 .view-solutions-browse-by-tag .ui-corner-bottom {
   border-bottom-left-radius: 0px;
   border-bottom-right-radius: 0px;
 }
 
 /* PLACEHOLDER */
-/* line 712, ../sass/doable.scss */
+/* line 749, ../sass/doable.scss */
 html {
   height: 100% !important;
   padding: 0 !important;
   margin: 0 !important;
 }
 
-/* line 718, ../sass/doable.scss */
+/* line 755, ../sass/doable.scss */
 body.page-welcome {
   min-height: 100% !important;
   height: 100% !important;
@@ -2466,7 +2503,7 @@ body.page-welcome {
   min-height: 960px;
 }
 
-/* line 728, ../sass/doable.scss */
+/* line 765, ../sass/doable.scss */
 body.page-welcome #page {
   min-height: 100% !important;
   height: 100% !important;
@@ -2478,7 +2515,7 @@ body.page-welcome #page {
   padding-bottom: 0px;
 }
 
-/* line 739, ../sass/doable.scss */
+/* line 776, ../sass/doable.scss */
 body.page-welcome #page #main,
 body.page-welcome #page #main #content,
 body.page-welcome #page #main #content .panel-flexible,
@@ -2492,7 +2529,7 @@ body.page-welcome #page #main #content .contextual-links-region {
   margin: 0 !important;
 }
 
-/* line 753, ../sass/doable.scss */
+/* line 790, ../sass/doable.scss */
 body.page-welcome #page #main #content .panel-flexible-inside,
 body.page-welcome #page #main #content .panel-flexible-inside,
 body.page-welcome #page #main #content .panels-flexible-region-first,
@@ -2506,7 +2543,7 @@ body.page-welcome #page #main #content .field-name-field-pane-body {
   margin: 0 !important;
 }
 
-/* line 766, ../sass/doable.scss */
+/* line 803, ../sass/doable.scss */
 body.page-welcome #page .panels-flexible-region-first {
   background-color: #2c4460;
   background-color: rgba(44, 68, 96, 0.8) !important;
@@ -2517,12 +2554,12 @@ body.page-welcome #page .panels-flexible-region-first {
   vertical-align: top;
 }
 
-/* line 777, ../sass/doable.scss */
+/* line 814, ../sass/doable.scss */
 body.page-welcome #page .field-name-field-pane-body {
   margin: 0 !important;
 }
 
-/* line 782, ../sass/doable.scss */
+/* line 819, ../sass/doable.scss */
 body.page-welcome #page .field-name-field-pane-body .field-item {
   background: url(../images/logo-doable.png) no-repeat top left;
   padding-top: 80px;
@@ -2532,7 +2569,7 @@ body.page-welcome #page .field-name-field-pane-body .field-item {
   overflow: scroll;
 }
 
-/* line 791, ../sass/doable.scss */
+/* line 828, ../sass/doable.scss */
 body.page-welcome #page .field-name-field-pane-body p {
   color: white;
   font-family: "ProximaNova";
@@ -2543,12 +2580,12 @@ body.page-welcome #page .field-name-field-pane-body p {
 }
 
 /* TEAM */
-/* line 804, ../sass/doable.scss */
+/* line 841, ../sass/doable.scss */
 .fieldable-panels-pane.view-mode-intro {
   margin-bottom: 40px;
 }
 
-/* line 808, ../sass/doable.scss */
+/* line 845, ../sass/doable.scss */
 .fieldable-panels-pane.view-mode-intro .field-name-field-pane-subtitle div.field-item {
   font-family: "MuseoSans", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   color: #666666 !important;
@@ -2563,7 +2600,7 @@ body.page-welcome #page .field-name-field-pane-body p {
   margin-bottom: 20px;
 }
 
-/* line 823, ../sass/doable.scss */
+/* line 860, ../sass/doable.scss */
 .view-team-grid .views-column {
   display: inline-block;
   width: 30%;
@@ -2571,13 +2608,13 @@ body.page-welcome #page .field-name-field-pane-body p {
   margin-bottom: 40px;
 }
 
-/* line 830, ../sass/doable.scss */
+/* line 867, ../sass/doable.scss */
 .view-team-grid .views-column-2 {
   margin-left: 3%;
   margin-right: 3%;
 }
 
-/* line 835, ../sass/doable.scss */
+/* line 872, ../sass/doable.scss */
 .view-team-grid .views-field-field-user-photo img {
   border: 1px solid #D6D6D6;
   width: 100%;
@@ -2585,27 +2622,27 @@ body.page-welcome #page .field-name-field-pane-body p {
   background-color: #D6D6D6;
 }
 
-/* line 842, ../sass/doable.scss */
+/* line 879, ../sass/doable.scss */
 .view-team-grid .views-field-field-user-doable-team-title {
   font-style: italic;
   margin-bottom: 3px;
 }
 
 /* SEARCH */
-/* line 850, ../sass/doable.scss */
+/* line 887, ../sass/doable.scss */
 div#block-search-form {
   margin-top: 15px;
   float: right;
 }
 
-/* line 855, ../sass/doable.scss */
+/* line 892, ../sass/doable.scss */
 form#search-block-form {
   height: 30px;
   margin: 0;
   padding: 0;
 }
 
-/* line 862, ../sass/doable.scss */
+/* line 899, ../sass/doable.scss */
 form#search-block-form .form-type-textfield {
   width: 260px;
   margin: 0px;
@@ -2624,7 +2661,7 @@ form#search-block-form .form-type-textfield {
   background-color: #FFF;
 }
 
-/* line 880, ../sass/doable.scss */
+/* line 917, ../sass/doable.scss */
 #search-block-form .form-actions {
   width: 32x;
   height: 26px;
@@ -2644,7 +2681,7 @@ form#search-block-form .form-type-textfield {
   float: left;
 }
 
-/* line 899, ../sass/doable.scss */
+/* line 936, ../sass/doable.scss */
 #search-block-form input.form-text {
   border: none;
   outline: none;
@@ -2664,7 +2701,7 @@ form#search-block-form .form-type-textfield {
   zoom: 1;
 }
 
-/* line 918, ../sass/doable.scss */
+/* line 955, ../sass/doable.scss */
 #search-block-form input.form-submit {
   border: none;
   outline: none;
@@ -2676,31 +2713,31 @@ form#search-block-form .form-type-textfield {
 }
 
 /* TAGS - Grid */
-/* line 933, ../sass/doable.scss */
+/* line 970, ../sass/doable.scss */
 .view-tags-grid .item-list {
   width: 33%;
   display: inline-block;
   vertical-align: top;
 }
 
-/* line 939, ../sass/doable.scss */
+/* line 976, ../sass/doable.scss */
 .view-tags-grid ul {
   margin-top: 0;
   padding-left: 0;
 }
 
-/* line 944, ../sass/doable.scss */
+/* line 981, ../sass/doable.scss */
 .view-tags-grid ul li {
   list-style: none;
 }
 
 /* PROMOS - FlexSlider */
-/* line 953, ../sass/doable.scss */
+/* line 990, ../sass/doable.scss */
 .panels-flexible-region-1-center {
   vertical-align: top;
 }
 
-/* line 957, ../sass/doable.scss */
+/* line 994, ../sass/doable.scss */
 .flexslider {
   background: none repeat scroll 0 0 #fff;
   border: 0px solid #fff;
@@ -2710,7 +2747,7 @@ form#search-block-form .form-type-textfield {
   position: relative;
 }
 
-/* line 970, ../sass/doable.scss */
+/* line 1007, ../sass/doable.scss */
 div.flex-caption {
   height: 80px;
   top: -80px;
@@ -2720,7 +2757,7 @@ div.flex-caption {
 }
 
 /* PROMOS - FlexSlider, Nav Controls */
-/* line 982, ../sass/doable.scss */
+/* line 1019, ../sass/doable.scss */
 .flex-direction-nav a {
   color: rgba(0, 0, 0, 0.9);
   height: 80px;
@@ -2728,58 +2765,58 @@ div.flex-caption {
   z-index: 10;
 }
 
-/* line 989, ../sass/doable.scss */
+/* line 1026, ../sass/doable.scss */
 ul.flex-direction-nav a {
   display: block !important;
 }
 
-/* line 993, ../sass/doable.scss */
+/* line 1030, ../sass/doable.scss */
 .flex-direction-nav .flex-disabled a {
   display: block !important;
 }
 
-/* line 997, ../sass/doable.scss */
+/* line 1034, ../sass/doable.scss */
 .flex-direction-nav .flex-prev {
   left: 0px;
 }
 
-/* line 1001, ../sass/doable.scss */
+/* line 1038, ../sass/doable.scss */
 .flex-direction-nav .flex-next {
   right: 0px;
   text-align: right;
   margin-top: 1px;
 }
 
-/* line 1007, ../sass/doable.scss */
+/* line 1044, ../sass/doable.scss */
 .flexslider:hover .flex-prev {
   opacity: 1;
   left: 0px;
 }
 
-/* line 1012, ../sass/doable.scss */
+/* line 1049, ../sass/doable.scss */
 .flexslider:hover .flex-next {
   opacity: 1;
   right: 0px;
 }
 
-/* line 1017, ../sass/doable.scss */
+/* line 1054, ../sass/doable.scss */
 .flexslider:hover .flex-next:hover {
   opacity: 1;
 }
 
-/* line 1021, ../sass/doable.scss */
+/* line 1058, ../sass/doable.scss */
 .flexslider:hover .flex-prev {
   opacity: 1;
   left: 0px;
 }
 
-/* line 1026, ../sass/doable.scss */
+/* line 1063, ../sass/doable.scss */
 .flexslider:hover .flex-next {
   opacity: 1;
   right: 0px;
 }
 
-/* line 1031, ../sass/doable.scss */
+/* line 1068, ../sass/doable.scss */
 .flex-direction-nav a:before {
   font-size: 12px;
   display: block;
@@ -2788,7 +2825,7 @@ ul.flex-direction-nav a {
   top: -50px;
 }
 
-/* line 1039, ../sass/doable.scss */
+/* line 1076, ../sass/doable.scss */
 .flex-direction-nav .flex-prev {
   left: 0px !important;
   content: "" !important;
@@ -2796,7 +2833,7 @@ ul.flex-direction-nav a {
   padding: 5px;
 }
 
-/* line 1046, ../sass/doable.scss */
+/* line 1083, ../sass/doable.scss */
 .flex-direction-nav .flex-next {
   right: 0px !important;
   content: "" !important;
@@ -2805,7 +2842,7 @@ ul.flex-direction-nav a {
 }
 
 /* PAGER */
-/* line 1058, ../sass/doable.scss */
+/* line 1095, ../sass/doable.scss */
 div.item-list ul.pager {
   margin-top: 20px;
   border-top: dotted 1px #D6D6D6;
@@ -2816,14 +2853,14 @@ div.item-list ul.pager {
   padding-bottom: 20px;
 }
 
-/* line 1068, ../sass/doable.scss */
+/* line 1105, ../sass/doable.scss */
 div.item-list li.pager-item,
 div.item-list li.pager-current {
   margin: 0 5px;
   padding: 0;
 }
 
-/* line 1074, ../sass/doable.scss */
+/* line 1111, ../sass/doable.scss */
 div.item-list li.pager-item a,
 div.item-list li.pager-ellipsis,
 div.item-list li.pager-current {
@@ -2839,19 +2876,19 @@ div.item-list li.pager-current {
   padding: 13px 8px 10px;
 }
 
-/* line 1091, ../sass/doable.scss */
+/* line 1128, ../sass/doable.scss */
 div.item-list li.pager-current {
   color: #333333;
   background: url(../images/icon-pager-current.png) no-repeat center center;
 }
 
-/* line 1097, ../sass/doable.scss */
+/* line 1134, ../sass/doable.scss */
 div.item-list li.pager-item a:hover {
   color: #3D8901;
   border-style: none;
 }
 
-/* line 1102, ../sass/doable.scss */
+/* line 1139, ../sass/doable.scss */
 div.item-list ul.pager li.pager-current first {
   margin-left: 0px;
   margin-right: 15px;
@@ -2859,7 +2896,7 @@ div.item-list ul.pager li.pager-current first {
   font-size: 11px;
 }
 
-/* line 1109, ../sass/doable.scss */
+/* line 1146, ../sass/doable.scss */
 div.item-list ul.pager li.pager-previous {
   margin-left: 0px;
   margin-right: 0px;
@@ -2867,7 +2904,7 @@ div.item-list ul.pager li.pager-previous {
   font-size: 11px;
 }
 
-/* line 1116, ../sass/doable.scss */
+/* line 1153, ../sass/doable.scss */
 div.item-list ul.pager li.pager-next,
 div.item-list ul.pager li.pager-last {
   margin-left: 15px;
@@ -2876,19 +2913,19 @@ div.item-list ul.pager li.pager-last {
   font-size: 11px;
 }
 
-/* line 1124, ../sass/doable.scss */
+/* line 1161, ../sass/doable.scss */
 ul.pager li a.active,
 ul.pager a {
   color: #333333;
 }
 
-/* line 1129, ../sass/doable.scss */
+/* line 1166, ../sass/doable.scss */
 ul.pager li a.active:hover,
 ul.pager a:hover {
   color: #CCCCCC;
 }
 
-/* line 1134, ../sass/doable.scss */
+/* line 1171, ../sass/doable.scss */
 ul.pager li.pager-current {
   color: #3D8901;
 }
