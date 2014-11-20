@@ -1,0 +1,14 @@
+name = Personalize Elements
+description = Allows personalization of any element on a page, specified by selector.
+dependencies[] = personalize
+package = Personalization
+core = 7.x
+
+files[] = tests/personalize_elements.test
+
+; Information added by Drupal.org packaging script on 2014-11-07
+version = "7.x-1.0-beta17"
+core = "7.x"
+project = "personalize"
+datestamp = "1415383997"
+

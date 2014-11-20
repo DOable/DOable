@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * @file personalize_test_extra_agent.module
+ * Provides an extra agent type plugin for testing purposes.
+ */
+
+/**
+ * Implements hook_personalize_agent_type().
+ */
+function personalize_test_extra_agent_personalize_agent_type() {
+  $info = array();
+  $path = drupal_get_path('module', 'personalize_test_extra_agent') . '/plugins';
+  $info['test_extra_agent'] = array(
+    'path' => $path . '/agent_types',
+    'handler' => array(
+      'file' => 'PersonalizeTestExtraAgent.inc',
+      'class' => 'PersonalizeTestExtraAgent',
+    ),
+  );
+  $info['test_invalid_agent'] = array(
+    'path' => $path . '/agent_types',
+    'handler' => array(
+      'file' => 'PersonalizeTestInvalidAgent.inc',
+      'class' => 'PersonalizeTestInvalidAgent',
+    ),
+  );
+  return $info;
+}
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function personalize_test_extra_agent_ctools_plugin_api($owner, $api) {
+  if ($owner == 'personalize' && $api == 'personalize') {
+    return array('version' => 1);
+  }
+}

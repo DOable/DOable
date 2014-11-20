@@ -1,0 +1,14 @@
+Upgrading from Personalize-7.x-1.0-beta7 to Personalize-7.x-1.0-beta8 or later
+
+  After upgrading the module code, DO NOT RUN update.php until after you've
+  met the following conditions:
+
+  * If you're also using the Acquia Lift module, update to its 7.x-1.0-beta8
+    or higher module version.
+  * Modify any custom code you may have that provides a visitor context plugin.
+    The interface for Visitor Context plugins has changed. If you have any code
+    on your site that implements PersonalizeContextInterface, note that the
+    method signature for getPossibleValues() now takes a $limit parameter.
+  * Ensure that personalize module and any modules providing visitor context
+    plugins are enabled when you run the update, otherwise fixed targeting
+    rules will be removed from your option sets.
