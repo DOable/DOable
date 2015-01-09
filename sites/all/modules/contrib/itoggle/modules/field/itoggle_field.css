@@ -1,0 +1,8 @@
+div.form-item.form-type-itoggle label.field-label {
+  float: left;
+  margin-right: 1em;
+}
+
+div.form-item.form-type-itoggle div.itoggle-wrapper {
+  float: left;
+}

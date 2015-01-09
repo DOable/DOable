@@ -1,0 +1,14 @@
+core = 7.x
+description = iToggle Views Support. Adds a Views Handler to insert iToggle Widgets in your views.
+name = iToggle Views
+dependencies[] = itoggle
+dependencies[] = views
+package = iToggle
+files[] = itoggle_views_handler_field.inc
+
+; Information added by Drupal.org packaging script on 2014-04-10
+version = "7.x-2.7"
+core = "7.x"
+project = "itoggle"
+datestamp = "1397164462"
+

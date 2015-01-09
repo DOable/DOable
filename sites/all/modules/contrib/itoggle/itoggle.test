@@ -1,0 +1,38 @@
+<?php
+/**
+ * @file
+ * iToggle tests.
+ */
+
+class iToggleTestCase extends DrupalWebTestCase {
+  public static function getInfo() {
+    return array(
+      'name' => 'iToggle',
+      'description' => 'Ensure that the iToggle functionality works correctly.',
+      'group' => 'iToggle',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp('itoggle');
+
+    $this->admin_user = $this->drupalCreateUser(array(
+      'administer nodes',
+      'administer users',
+      'administer itoggle',
+      'use itoggle',
+    ));
+
+    $this->user = $this->drupalCreateUser(array(
+      'administer nodes',
+      'use itoggle',
+    ));
+
+    $this->web_user = $this->drupalCreateUser(array());
+  }
+
+  public function testiToggle() {
+    $this->drupalLogin($this->admin_user);
+
+  }
+}

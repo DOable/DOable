@@ -1,0 +1,25 @@
+<?php
+/**
+ * @file
+ * iToggle Field installation hooks.
+ */
+
+/**
+ * Implements hook_field_schema().
+ */
+function itoggle_field_field_schema() {
+  return array(
+    'columns' => array(
+      'value' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'size' => 'tiny',
+        'default' => 0,
+        'unsigned' => TRUE,
+      ),
+    ),
+    'indexes' => array(
+      'value' => array('value'),
+    ),
+  );
+}

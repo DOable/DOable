@@ -1,0 +1,36 @@
+<?php
+/**
+ * @file
+ * iToggle installation hooks.
+ */
+
+/**
+ * Implements hook_uninstall().
+ */
+function itoggle_uninstall() {
+  // Remove used variables.
+  $result = db_query("SELECT name FROM {variable} WHERE name LIKE 'itoggle%'");
+
+  foreach ($result as $row) {
+    variable_del($row->name);
+  }
+}
+
+/**
+ * Delete unused library path variables.
+ */
+function itoggle_update_7000() {
+  variable_del('itoggle_path');
+  variable_del('itoggle_easing_path');
+  return t('Deleted unused library path variables.');
+}
+
+/**
+ * Reset easing options. Easing has been refactored and now depends on the
+ * jQuery Easing module.
+ */
+function itoggle_update_7001(&$sandbox) {
+  variable_del('itoggle_easing_use');
+  variable_del('itoggle_easing_function');
+  return t('Update successfull.');
+}

@@ -1,0 +1,379 @@
+<?php
+/**
+ * @file
+ * iToggle Field module.
+ */
+
+/**
+ * Implements hook_field_info().
+ */
+function itoggle_field_field_info() {
+  return array(
+    'itoggle_field' => array(
+      'label' => 'Boolean (iToggle)',
+      'description' => t('This field stores simple on/off or yes/no options and can be updated via AJAX.'),
+      'settings' => array(),
+      'instance_settings' => array(
+        'clickable' => 1,
+        'display_type' => 0,
+      ),
+      'default_widget' => 'itoggle_widget',
+      'default_formatter' => 'itoggle_formatter',
+      // Expose the field as boolean for the Entity metadata framework.
+      'property_type' => 'boolean',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function itoggle_field_field_is_empty($item, $field) {
+  // Technically a boolean field is never empty.
+  // Even if submitted without touching the field, it's still considered FALSE.
+  return FALSE;
+}
+
+/**
+ * Implements hook_field_widget_info().
+ *
+ */
+function itoggle_field_field_widget_info() {
+  return array(
+    'itoggle_widget' => array(
+      'label' => t('iToggle Widget'),
+      'field types' => array('itoggle_field'),
+      'settings' => array(
+        'clickable' => 1,
+        'display_type' => 0,
+      ),
+      'behaviors' => array(
+        'multiple values' => FIELD_BEHAVIOR_CUSTOM,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_error().
+ */
+function itoggle_field_field_widget_error($element, $error, $form, &$form_state) {
+  form_error($element, $error['message']);
+}
+
+/**
+ * Implements hook_field_widget_settings_form().
+ */
+function itoggle_field_field_widget_settings_form($field, $instance) {
+  $form = array();
+
+  if ($instance['widget']['type'] === 'itoggle_widget') {
+    $form['itoggle_settings'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('iToggle'),
+      '#collapsible' => FALSE,
+      '#weight' => -1,
+      '#tree' => TRUE,
+      '#attached' => array(
+        'css' => array(drupal_get_path('module', 'itoggle_field') . '/itoggle_field.css'),
+        'js' => array(drupal_get_path('module', 'itoggle_field') . '/itoggle_field.js'),
+      ),
+    );
+
+    $clickable = $instance['widget']['settings']['clickable'];
+    $display_type = $instance['widget']['settings']['display_type'];
+    $options_form = itoggle_get_options_form($clickable, $display_type);
+
+    // Wrap the form in a fieldset.
+    foreach ($options_form as $key => $value) {
+      $form['itoggle_settings'][$key] = $value;
+    }
+  }
+
+  return $form;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function itoggle_field_form_field_ui_field_edit_form_alter(&$form, &$form_state) {
+  $field_name = $form['#instance']['field_name'];
+  $instance = field_info_instance($form['#instance']['entity_type'], $field_name, $form['#instance']['bundle']);
+
+  if (isset($instance['widget']) && $instance['widget']['type'] === 'itoggle_widget') {
+    // Add out submit callback.
+    array_unshift($form['#submit'], 'itoggle_field_form_field_ui_field_edit_submit');
+    // Hide cardinality option.
+    $form['field']['cardinality']['#access'] = FALSE;
+    // If its the only one, hide the entire "field" settings fieldset.
+    if (count(element_children($form['field'])) === 1) {
+      $form['field']['#access'] = FALSE;
+    }
+  }
+}
+
+/**
+ * Submit callback.
+ * Fix settings values, for some reason using #tree in the container didn't work.
+ *
+ * @see itoggle_field_form_field_ui_field_edit_form_alter()
+ */
+function itoggle_field_form_field_ui_field_edit_submit($form, &$form_state) {
+  $settings = $form_state['values']['instance']['widget']['settings']['itoggle_settings'];
+  unset($form_state['values']['instance']['widget']['settings']['itoggle_settings']);
+
+  foreach ($settings as $k => $v) {
+    $form_state['values']['instance']['widget']['settings'][$k] = $v;
+  }
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function itoggle_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $instance_default = isset($instance['default_value'][$delta]['value'])
+    ? $instance['default_value'][$delta]['value']
+    : 0;
+
+  if (isset($form['vid']['#value'])) {
+    $default_value = (isset($items[$delta]['value']) && $items[$delta]['value'] == 1)
+      ? 1
+      : 0;
+  }
+  else {
+    $default_value = isset($items[$delta]['value'])
+      ? $items[$delta]['value']
+      : $instance_default;
+  };
+
+  $element += array(
+    '#type' => 'checkbox',
+    '#default_value' => $default_value,
+    '#on_value' => 1,
+    '#off_value' => 0,
+    '#title' => $instance['label'],
+    '#element_validate' => array('itoggle_field_field_widget_validate'),
+    '#after_build' => array('itoggle_hide_checkbox'),
+    '#value_key' => 'value',
+  );
+
+  $required = ($instance['required'] == 1)
+    ? ' <span title="' . t('This field is required.') . '" class="form-required">*</span>'
+    : '';
+
+  $label = $instance['label'];
+  $property_prefix = empty($element['#field_parents']) ? '' : implode('-', $element['#field_parents'] . '-');
+
+  $form["itoggle_helper_{$field['field_name']}"] = array(
+    '#theme' => 'itoggle',
+    '#type' => $instance['entity_type'],
+    '#bundle' => $instance['bundle'],
+    '#id' => $field['field_name'],
+    '#property' => $property_prefix . $field['field_name'],
+    '#checked' => $default_value,
+    '#scope' => 'field-edit',
+    '#display_type' => $instance['widget']['settings']['display_type'],
+    '#prefix' => "<div class=\"form-item form-type-itoggle form-item-{$field['field_name']}\"><label class=\"field-label\">{$label}{$required}</label>",
+    '#suffix' => '<div class="clearfix"></div></div>',
+    '#weight' => $instance['widget']['weight'],
+  );
+
+  // Play nice with Field Group module.
+  if (module_exists('field_group')) {
+    if (!isset($form['#after_build']) || !in_array('itoggle_form_field_group_after_build', $form['#after_build'])) {
+      $form['#after_build'][] = 'itoggle_form_field_group_after_build';
+    }
+  }
+
+  return $element;
+}
+
+/**
+ * Form element validation handler for iToggle element.
+ *
+ * @see itoggle_field_field_widget_form()
+ */
+function itoggle_field_field_widget_validate($element, &$form_state) {
+  if ($element['#required'] && $element['#value'] == '_none') {
+    form_error($element, t('!name field is required.', array('!name' => $element['#title'])));
+  }
+
+  $items = array(array('value' => $element['#value']));
+  form_set_value($element, $items, $form_state);
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function itoggle_field_field_formatter_info() {
+  return array(
+    'itoggle_formatter' => array(
+      'label' => t('iToggle Widget'),
+      'description' => t('Displays the field as an iToggle Widget.'),
+      'field types' => array('itoggle_field', 'list_boolean'),
+      'settings' => array('clickable' => 0, 'display_type' => 0, 'override' => 0),
+    ),
+    'itoggle_raw' => array(
+      'label' => t('Raw Value'),
+      'description' => t('Displays the raw value of the field.'),
+      'field types' => array('itoggle_field'),
+      'settings' => array(),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function itoggle_field_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  if ($instance['display'][$view_mode]['type'] === 'itoggle_formatter') {
+    $clickable = $instance['display'][$view_mode]['settings']['clickable'];
+    $display_type = $instance['display'][$view_mode]['settings']['display_type'];
+    $override = (bool) $instance['display'][$view_mode]['settings']['override'];
+    $form = itoggle_get_options_form($clickable, $display_type, $override);
+
+    if ($field['type'] !== 'itoggle_field') {
+      $form['override']['#access'] = FALSE;
+      $form['clickable']['#access'] = FALSE;
+    }
+
+    return $form;
+  }
+
+  return array();
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function itoggle_field_field_formatter_settings_summary($field, $instance, $view_mode) {
+  if ($instance['display'][$view_mode]['type'] === 'itoggle_formatter') {
+    $display_type = $instance['display'][$view_mode]['settings']['display_type'];
+    $summary = array();
+
+    if ($field['type'] === 'itoggle_field') {
+      $clickable = $instance['display'][$view_mode]['settings']['clickable'];
+      $override = $instance['display'][$view_mode]['settings']['override'];
+    }
+    else {
+      $clickable = 0;
+      $override = 1;
+    }
+
+    // Format strings.
+    $clickable = ($clickable == 1) ? t('Yes') : t('No');
+    $display_type = ($display_type == 1) ? t('Yes/No') : t('On/Off');
+    $override = ($override == 1) ? t('Yes') : t('No');
+
+    $summary[] = t('Display Type: %display_type', array('%display_type' => $display_type));
+
+    if ($field['type'] === 'itoggle_field') {
+      $summary[] = t('Clickable: %clickable', array('%clickable' => $clickable));
+      $summary[] = t('Override Widget: %override', array('%override' => $override));
+    }
+    else {
+      $summary[] = '<strong>' . t('To make this widget clickable, please use an iToggle Field') . '</strong>';
+    }
+
+    return implode('<br />', $summary);
+  }
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function itoggle_field_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $elements = array();
+
+  if ($display['type'] === 'itoggle_formatter') {
+    $info = entity_get_info($entity_type);
+    $bundle_key = $info['bundle keys']['bundle'];
+    $id_key = $info['entity keys']['id'];
+    $id = $entity->{$id_key};
+    $bundle = $entity->{$bundle_key};
+    $checked = (isset($items[0]['value']) && $items[0]['value'] == 1);
+
+    if ($field['type'] === 'itoggle_field') {
+      if ($display['settings']['override'] == 1) {
+        $clickable = $display['settings']['clickable'];
+        $display_type = $display['settings']['display_type'];
+      }
+      else {
+        $clickable = isset($instance['widget']['settings']['clickable']) ? $instance['widget']['settings']['clickable']
+            : $display['settings']['clickable'];
+        $display_type = isset($instance['widget']['settings']['display_type']) ? $instance['widget']['settings']['display_type']
+            : $display['settings']['display_type'];
+      }
+    }
+    else {
+      $clickable = 0;
+      $display_type = $display['settings']['display_type'];
+    }
+
+    foreach ($items as $delta => $item) {
+      $elements[$delta] = array(
+        '#theme' => 'itoggle',
+        '#type' => $entity_type,
+        '#bundle' => $bundle,
+        '#id' => $id,
+        '#property' => $field['field_name'],
+        '#checked' => $checked,
+        '#scope' => 'field',
+        '#clickable' => $clickable,
+        '#display_type' => $display_type,
+      );
+    }
+  }
+  else {
+    foreach ($items as $delta => $item) {
+      $elements[$delta] = array(
+        '#markup' => $item['value'],
+      );
+    }
+  }
+
+  return $elements;
+}
+
+/**
+ * After build callback.
+ * Make iToggle play nice with fieldgroups.
+ *
+ * @see itoggle_field_field_widget_form()
+ */
+function itoggle_form_field_group_after_build($element) {
+  if (isset($element['#group_children'])) {
+    foreach ($element as $k => $v) {
+      if (strpos($k, 'itoggle_helper') === 0) {
+        $field_name = str_replace('itoggle_helper_', '', $k);
+        if (array_key_exists($field_name, $element['#group_children'])) {
+          $element['#group_children'][$k] = $element['#group_children'][$field_name];
+        }
+      }
+    }
+  }
+  return $element;
+}
+
+/**
+ * Return all iToggle field names. This is mostly a helper function for the
+ * iToggle Views module.
+ */
+function itoggle_field_get_fields() {
+  static $fields;
+
+  if (!isset($fields)) {
+    $fields = array();
+    $result =
+      db_select('field_config', 'fc')
+        ->fields('fc', array('field_name'))
+        ->condition('module', 'itoggle_field', '=')
+        ->execute();
+
+    foreach ($result as $row) {
+      $fields[] = $row->field_name;
+    }
+  }
+
+  return $fields;
+}

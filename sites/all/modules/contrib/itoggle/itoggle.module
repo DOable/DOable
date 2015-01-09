@@ -1,0 +1,511 @@
+<?php
+/**
+ * @file
+ * iToggle core module.
+ */
+
+/**
+ * Implements hook_permission().
+ */
+function itoggle_permission() {
+  $permissions = array(
+    'administer itoggle' => array(
+      'title' => t('Administer iToggle'),
+      'description' => t('Configure the iToggle module'),
+    ),
+    'use itoggle' => array(
+      'title' => t('Use iToggle'),
+      'description' => t('Use the iToggle Widget to toggle entity property and field values.'),
+    ),
+  );
+
+  return $permissions;
+}
+
+/**
+ * Implements hook_help().
+ */
+function itoggle_help($path, $arg) {
+  switch ($path) {
+    case 'admin/config/itoggle':
+      return t('This is the iToggle configuration page. Override iToggle default settings here. To include the iToggle plugin yourself, just call itoggle_include_itoggle() from your code.');
+      break;
+    case 'admin/help#itoggle':
+      $output = '<h3>' . t('About') . '</h3><p>' . t('The iToggle module defines a Boolean field for storing items, for use with the Field module. This item is entered through an iToggle Widget. See the <a href="@field-help">Field module help page</a> for more information about fields.', array('@field-help' => url('admin/help/field'))) . '</p>';
+
+      if (module_exists('advanced_help')) {
+        $output .= '<p>' . l('Click here to view the documentation for iToggle.', 'admin/advanced_help/itoggle') . '</p>';
+      }
+      else {
+        $output .= '<p>' . t('iToggle help can be found by installing and enabling the !advanced_help', array('!advanced_help' => l('Advanced Help module', 'http://drupal.org/project/advanced_help'))) . '</p>';
+      }
+
+      return $output;
+      break;
+  }
+}
+
+/**
+ * Implements hook_menu().
+ */
+function itoggle_menu() {
+  $items = array();
+
+  // Admin settings form.
+  $items['admin/config/user-interface/itoggle'] = array(
+    'title' => 'iToggle',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('itoggle_form_admin'),
+    'access arguments' => array('administer itoggle'),
+    'file' => 'itoggle.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  // AJAX callback.
+  $items['js/itoggle'] = array(
+    'page callback' => 'itoggle_ajax_callback',
+    'access callback' => 'user_access',
+    'access arguments' => array('use itoggle'),
+    'file' => 'itoggle.pages.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Adds iToggle options to node type forms.
+ */
+function itoggle_form_node_type_form_alter(&$form, $form_state) {
+  $type = $form['#node_type']->type;
+  $form['#submit'][] = 'itoggle_node_type_form_submit';
+  $varname = "itoggle_enable_{$type}";
+
+  $form['itoggle'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('iToggle settings'),
+    '#group' => 'additional_settings',
+    '#attached' => array(
+      'js' => array(drupal_get_path('module', 'itoggle') . '/misc/itoggle-node-type-form.js'),
+    ),
+    '#tree' => TRUE,
+  );
+
+  $form['itoggle'][$varname] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable iToggle for properties'),
+    '#description' => t('Check this option to enable iToggle widgets when editing the "promote", "sticky" and "status" node properties.'),
+    '#default_value' => variable_get($varname, FALSE),
+  );
+}
+
+/**
+ * Submit callback
+ *
+ * @see itoggle_node_type_form_alter().
+ */
+function itoggle_node_type_form_submit($form, &$form_state) {
+  $values =& $form_state['values'];
+  $type = $values['type'];
+
+  if (strpos($values['op'], 'Delete') === 0 || $form_state['triggering_element']['#parents'][0] === 'delete') {
+    // Deleting content type, therefore delete all iToggle variables related to it.
+    foreach ($values['itoggle'] as $name => $value) {
+      variable_del($name);
+    }
+  }
+  else {
+    $new = empty($values['old_type']);
+
+    foreach ($values['itoggle'] as $name => $value) {
+      if ($new) {
+        // Complete iToggle variable names with Content Type name.
+        $varname = $name . $type;
+      }
+      else {
+        $varname = $name;
+      }
+
+      variable_set($varname, $value);
+    }
+
+    // Delete bogus variable that is automatically created.
+    // Ideally we wouldn't allow it to get created but can't seem to work around this.
+    // @TODO fix this!
+    variable_del("itoggle_{$type}");
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ *
+ * @see itoggle_hide_checkbox()
+ */
+function itoggle_form_node_form_alter(&$form, &$form_state, $form_id) {
+  $type = $form_state['node']->type;
+
+  if (variable_get("itoggle_enable_{$type}", FALSE)) {
+    // Status field.
+    $label = t($form['options']['status']['#title']);
+    $form['options']['status']['#after_build'][] = 'itoggle_hide_checkbox';
+    $form['options']["itoggle_helper_status"] = array(
+      '#theme' => 'itoggle',
+      '#type' => 'node',
+      '#id' => $form['nid']['#value'],
+      '#property' => 'status',
+      '#checked' => $form['options']['status']['#default_value'],
+      '#scope' => 'field-edit',
+      '#display_type' => 1,
+      '#prefix' => "<div class=\"form-item form-type-itoggle form-item-status\"><label class=\"field-label\">{$label}</label>",
+      '#suffix' => '<div class="clearfix"></div></div>',
+    );
+
+    // Promote field.
+    $label = $form['options']['promote']['#title'];
+    $form['options']['promote']['#after_build'][] = 'itoggle_hide_checkbox';
+    $form['options']["itoggle_helper_promote"] = array(
+      '#theme' => 'itoggle',
+      '#type' => 'node',
+      '#id' => $form['nid']['#value'],
+      '#property' => 'promote',
+      '#checked' => $form['options']['promote']['#default_value'],
+      '#scope' => 'field-edit',
+      '#display_type' => 1,
+      '#prefix' => "<div class=\"form-item form-type-itoggle form-item-promote\"><label class=\"field-label\">{$label}</label>",
+      '#suffix' => '<div class="clearfix"></div></div>',
+    );
+
+    // Sticky field.
+    $label = $form['options']['sticky']['#title'];
+    $form['options']['sticky']['#after_build'][] = 'itoggle_hide_checkbox';
+    $form['options']["itoggle_helper_sticky"] = array(
+      '#theme' => 'itoggle',
+      '#type' => 'node',
+      '#id' => $form['nid']['#value'],
+      '#property' => 'sticky',
+      '#checked' => $form['options']['sticky']['#default_value'],
+      '#scope' => 'field-edit',
+      '#display_type' => 1,
+      '#prefix' => "<div class=\"form-item form-type-itoggle form-item-sticky\"><label class=\"field-label\">{$label}</label>",
+      '#suffix' => '<div class="clearfix"></div></div>',
+    );
+
+    // Fix fieldset summary.
+    $form['options']['#attached'] = array('js' => array(drupal_get_path('module', 'itoggle') . '/misc/itoggle-node-form.js'));
+  }
+}
+
+/**
+ * Include iToggle css and javascript files.
+ *
+ * @param boolean
+ *   Whether we are just including iToggle scripts or also our own
+ *   settings and script.
+ */
+function itoggle_include_itoggle($settings = TRUE) {
+  static $css_added = FALSE;
+  static $lib_added = FALSE;
+  static $js_added = FALSE;
+  // @TODO define library and include via libraries api
+  // @TODO define css as part of library
+
+  // Add iToggle default CSS.
+  if (!$css_added && variable_get('itoggle_css', TRUE)) {
+    drupal_add_css(drupal_get_path('module', 'itoggle') . '/misc/itoggle.css');
+    $css_added = TRUE;
+  }
+
+  // Add iToggle library.
+  if (!$lib_added) {
+    $filename = 'itoggle';
+
+    if (module_exists('jquery_update')) {
+      if (version_compare(variable_get('jquery_update_jquery_version', '1.5'), '1.7', '>=')) {
+        $filename .= '-1.7';
+      }
+    }
+
+    if (($type = variable_get('itoggle_compression_type', 'min')) == 'min') {
+      $filename .= '.min';
+    }
+
+    drupal_add_js(drupal_get_path('module', 'itoggle') . "/misc/{$filename}.js", array('group' => JS_LIBRARY, 'weight' => 1));
+    $lib_added = TRUE;
+  }
+
+  // Add iToggle default JavaScript and settings.
+  if ($settings === TRUE) {
+    itoggle_include_settings();
+
+    if (!$js_added) {
+      drupal_add_js(drupal_get_path('module', 'itoggle') . '/misc/itoggle.drupal.js', array('group' => JS_THEME));
+      $js_added = TRUE;
+    }
+  }
+}
+
+/**
+ * Add iToggle settings to Drupal.settings object.
+ *
+ * @see itoggle_include_itoggle()
+ */
+function itoggle_include_settings() {
+  // We test if the settings are already configured.
+  $drupal_js = drupal_add_js();
+  $drupal_js_settings = $drupal_js['settings']['data'];
+  foreach ($drupal_js_settings as $setting) {
+    if (isset($setting['itoggle'])) {
+      return;
+    }
+  }
+
+  $settings = array(
+    'itoggle' => array(
+      'speed' => variable_get('itoggle_speed', 200),
+      'onclick' => variable_get('itoggle_onclick', ''),
+      'onclickon' => variable_get('itoggle_onclickon', ''),
+      'onclickoff' => variable_get('itoggle_onclickoff', ''),
+      'onslide' => variable_get('itoggle_onslide', ''),
+      'onslideon' => variable_get('itoggle_onslideon', ''),
+      'onslideoff' => variable_get('itoggle_onslideoff', ''),
+    )
+  );
+
+  if ($easing = variable_get('itoggle_easing_function', '')) {
+    $settings['itoggle']['easing'] = $easing;
+    libraries_load('easing');
+  }
+
+  drupal_add_js($settings, 'setting');
+}
+
+/**
+ * Loads information about defined entities and returns an array of possible
+ * boolean fields for toggling.
+ *
+ * @param $reset
+ *   A boolean indicating whether to bypass the cache.
+ * @return array
+ *   An array of available entity information.
+ */
+function itoggle_get_entity_info($reset = FALSE) {
+  // Use the advanced drupal_static() pattern, since this is called often.
+  static $drupal_static_fast;
+
+  if (!isset($drupal_static_fast)) {
+    $drupal_static_fast['itoggle_get_entity_info'] = &drupal_static(__FUNCTION__);
+  }
+
+  $allowed = &$drupal_static_fast['itoggle_get_entity_info'];
+
+  if ($reset || !is_array($allowed)) {
+    $cache = cache_get('itoggle_get_entity_info');
+
+    if (!$reset && isset($cache->data)) {
+      $allowed = $cache->data;
+    }
+    else {
+      $entities = entity_get_info();
+      $allowed = array();
+
+      foreach ($entities as $type => $info) {
+        $keys = array();
+        // Get table schema.
+        $schema = drupal_get_schema($info['base table']);
+        // Get entity metadata wrapper.
+        $wrapper = entity_metadata_wrapper($type);
+
+        foreach ($schema['fields'] as $cid => $val) {
+          // Boolean fields get stored as integers.
+          if ($val['type'] === 'int') {
+            // Avoid fields we know for a fact aren't boolean.
+            $avoid = array(
+              'created',
+              'changed',
+              'filesize',
+              'timestamp',
+              'translate',
+              'weight'
+            );
+
+            // Avoid more specific fields we know aren't boolean.
+            if ($type === 'user') {
+              $avoid[] = 'access';
+              $avoid[] = 'login';
+              $avoid[] = 'picture';
+            }
+            else if ($type === 'node') {
+              $avoid[] = 'comment';
+            }
+            else if ($type === 'taxonomy_vocabulary') {
+              $avoid[] = 'hierarchy';
+            }
+
+            // Proceed if field isn't in avoid list.
+            if (!in_array($cid, $avoid)) {
+              // Find field length and whether it contains the string 'id'.
+              $pos = strpos($cid, 'id');
+              $len = strlen($cid);
+
+              // Avoid fields ending in 'id'.
+              if ($pos === FALSE || ($len - $pos > 2)) {
+                // Try to load property info from entity metadata wrapper.
+                try {
+                  $property = $wrapper->getPropertyInfo($cid);
+
+                  // If we have a label, use it.
+                  if (isset($property['label'])) {
+                    $label = $property['label'];
+                  }
+                  else {
+                    $label = drupal_ucfirst($cid);
+                  }
+
+                  // Boolean properties = win.
+                  if ($property['type'] !== 'boolean') {
+                    // If not boolean, check whether it has an options list.
+                    if (isset($property['options list'])) {
+                      // If options list has 2 entries, consider it a boolean.
+                      $options_list = call_user_func($property['options list']);
+                      if (count($options_list) !== 2) {
+                        // No go, skip to next field.
+                        continue;
+                      }
+                    }
+                    else {
+                      // No go, skip to next field.
+                      continue;
+                    }
+                  }
+                  $keys[$cid] = $label;
+                }
+                catch (EntityMetadataWrapperException $e) {
+                  // If we can't use property info, take a guess.
+                  $keys[$cid] = drupal_ucfirst($cid);
+                }
+              }
+            }
+          }
+        }
+
+        if (!empty($keys)) {
+          $allowed[$type] = array(
+            'properties' => $keys,
+            'base table' => $info['base table'],
+            'entity keys' => $info['entity keys'],
+            'label' => $info['label'],
+          );
+
+          if (isset($info['access callback'])) {
+            $allowed[$type]['access callback'] = $info['access callback'];
+          }
+        }
+      }
+
+      cache_set('itoggle_get_entity_info', $allowed, 'cache', CACHE_TEMPORARY);
+    }
+  }
+
+  return $allowed;
+}
+
+/**
+ * Return form markup used for iToggle Widget Options.
+ * This is used in the Field Formatter, Field Widget and Views Handler.
+ *
+ * @param bool
+ *   Default $clickable value.
+ * @param bool
+ *   Default $display_type value.
+ * @param bool
+ *   Whether we are overriding default settings.
+ *   This is only used by the Field Formatter.
+ * @return array
+ *   A Form API array of fields.
+ */
+function itoggle_get_options_form($clickable, $display_type, $override = FALSE) {
+  $form = array(
+    'clickable' => array(
+      '#type' => 'checkbox',
+      '#title' => t('Make Widget Clickable'),
+      '#description' => t("Check this box to make the iToggle Widget clickable. When clicked the widget will try to update the it's value via AJAX (if the current user has the correct <a href=\"@url\">permissions</a>).", array('@url' => url('admin/people/permissions/#module-itoggle'))),
+      '#default_value' => $clickable,
+      '#weight' => -2,
+    ),
+    'display_type' => array(
+      '#type' => 'select',
+      '#title' => t('Display Type'),
+      '#description' => t('Choose between the default On/Off, Yes/No caption or a language-agnostic 1/0 caption for the Widget.'),
+      '#options' => array(t('On/Off'), t('Yes/No'), '1/0'),
+      '#default_value' => $display_type,
+      '#weight' => -1,
+    ),
+  );
+
+  if ($override) {
+    $form['override'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Override Widget Settings'),
+      '#description' => t('Check this box to override the Widget settings when displaying this field.'),
+      '#default_value' => $override,
+      '#weight' => -3
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * After build callback.
+ *
+ * This is used to hide the original checkbox when using an iToggle widget
+ * replacement for node property fields or in the iToggle widget settings
+ * form.
+ *
+ * @see itoggle_form_alter()
+ */
+function itoggle_hide_checkbox($element) {
+  // Hide original checkbox.
+  // We hide it like this so it can still be checked and unchecked by
+  // javascript. This allows for a quick & clean way of persisting the
+  // iToggle widget state.
+  $element['#theme_wrappers'] = array();
+  $element['#title'] = NULL;
+  $element['#attributes']['style'] = array('display:none;');
+  return $element;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function itoggle_theme() {
+  return array(
+    'itoggle' => array(
+      'variables' => array(
+        'type' => NULL,
+        'bundle' => NULL,
+        'id' => NULL,
+        'property' => NULL,
+        'checked' => NULL,
+        'scope' => NULL,
+        'clickable' => 1,
+        'display_type' => 0,
+      ),
+      'file' => 'itoggle.theme.inc',
+    ),
+  );
+}
+
+/**
+ * Implements hook_modules_disabled().
+ *
+ * Deletes easing option if jQuery Easing module is disabled.
+ * This will prevent breaking the widget.
+ */
+function itoggle_modules_disabled($modules) {
+  if (in_array('jqeasing', $modules)) {
+    variable_del('itoggle_easing_function');
+  }
+}

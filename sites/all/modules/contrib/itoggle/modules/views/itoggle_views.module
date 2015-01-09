@@ -1,0 +1,51 @@
+<?php
+/**
+ * @file
+ * iToggle Views module.
+ */
+
+/**
+ * Implements hook_views_api().
+ */
+function itoggle_views_views_api() {
+  return array('api' => 3);
+}
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function itoggle_views_views_data_alter(&$data) {
+  $info = itoggle_get_entity_info();
+
+  // Add iToggle fields for entity properties.
+  foreach ($info as $type => $entity) {
+    foreach ($entity['properties'] as $name => $label) {
+      // Fix for users.
+      if ($type === 'user') {
+        $type = 'users';
+      }
+      $data[$type]["itoggle-{$type}-{$name}"] = array(
+        'group' => t('iToggle'),
+        'title' => "{$entity['label']} {$label}",
+        'help' => t('iToggle Widget for %type %name property.', array('%type' => $entity['label'], '%name' => $label)),
+        'field' => array(
+          'handler' => 'itoggle_views_handler_field',
+          'click sortable' => TRUE,
+        ),
+      );
+    }
+  }
+
+  if (module_exists('itoggle_field')) {
+    // Set boolean filter for iToggle fields.
+    foreach (itoggle_field_get_fields() as $field) {
+      $target = "field_data_{$field}";
+      $value = "{$field}_value";
+      if (isset($data[$target])) {
+        $data[$target][$value]['filter']['handler'] = 'views_handler_filter_boolean_operator';
+        $data[$target][$value]['filter']['type'] = 'yes-no';
+        $data[$target][$value]['filter']['use equal'] = TRUE;
+      }
+    }
+  }
+}
